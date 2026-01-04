@@ -28,7 +28,7 @@ export interface AuthState {
 
 export const authService = {
   login: async (email: string, password: string): Promise<{ user: User; token: string } | null> => {
-    const data = await apiFetch(ENDPOINTS.AUTH.LOGIN, { method: "POST", body: { email, password } }).catch(() => null)
+    const data = await apiFetch(ENDPOINTS.AUTH.LOGIN, { method: "POST", body: { email, password }, suppressSuccessAlert: true }).catch(() => null)
     if (!data) return null
     const token = data.token || data.accessToken || ""
     const user: User = data.user || data

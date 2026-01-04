@@ -15,10 +15,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Mail, Phone, Calendar, Save } from "lucide-react"
 import { ENDPOINTS, apiFetch } from "@/lib/api"
 import Swal from "sweetalert2"
+import { Spinner } from "@/components/ui/spinner"
 
 export default function AdminProfile() {
   const { user, token, updateProfile } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [formData, setFormData] = useState({
     first_name: user?.first_name || "",
     last_name: user?.last_name || "",
@@ -55,12 +57,16 @@ export default function AdminProfile() {
     e.preventDefault()
     if (!token) return
     try {
-      const data = await apiFetch(ENDPOINTS.AUTH.PROFILE, { method: "PUT", token, body: formData })
+      setIsSaving(true)
+      const payload = Object.fromEntries(Object.entries(formData).filter(([_, v]) => v !== ""))
+      const data = await apiFetch(ENDPOINTS.AUTH.PROFILE, { method: "PUT", token, body: payload })
       const u = data.user || { ...user, ...formData }
       updateProfile(u)
       setIsEditing(false)
     } catch (err: any) {
       Swal.fire({ icon: "warning", title: "Error", text: err.message })
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -82,8 +88,8 @@ export default function AdminProfile() {
             <CardContent className="flex flex-col items-center space-y-4">
               <Avatar className="h-32 w-32">
                 <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
-                  {user?.first_name[0]}
-                  {user?.last_name[0]}
+                  {(user?.first_name || "U")[0]}
+                  {(user?.last_name || "N")[0]}
                 </AvatarFallback>
               </Avatar>
               <div className="text-center">
@@ -101,6 +107,13 @@ export default function AdminProfile() {
               <CardDescription>Update your personal details and contact information</CardDescription>
             </CardHeader>
             <CardContent>
+              {!isEditing && (
+                <div className="flex justify-end mb-4">
+                  <Button type="button" onClick={() => setIsEditing(true)} disabled={isSaving}>
+                    Edit Profile
+                  </Button>
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
@@ -109,7 +122,7 @@ export default function AdminProfile() {
                       id="first_name"
                       value={formData.first_name}
                       onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                      disabled={!isEditing}
+                      disabled={!isEditing || isSaving}
                     />
                   </div>
                   <div className="space-y-2">
@@ -118,7 +131,7 @@ export default function AdminProfile() {
                       id="last_name"
                       value={formData.last_name}
                       onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                      disabled={!isEditing}
+                      disabled={!isEditing || isSaving}
                     />
                   </div>
                 </div>
@@ -133,7 +146,7 @@ export default function AdminProfile() {
                       className="pl-10"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      disabled={!isEditing}
+                      disabled={!isEditing || isSaving}
                     />
                   </div>
                 </div>
@@ -148,7 +161,7 @@ export default function AdminProfile() {
                       className="pl-10"
                       value={formData.phone_number}
                       onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-                      disabled={!isEditing}
+                      disabled={!isEditing || isSaving}
                     />
                   </div>
                 </div>
@@ -163,7 +176,7 @@ export default function AdminProfile() {
                       className="pl-10"
                       value={formData.dob}
                       onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                      disabled={!isEditing}
+                      disabled={!isEditing || isSaving}
                     />
                   </div>
                 </div>
@@ -175,24 +188,22 @@ export default function AdminProfile() {
                     rows={3}
                     value={formData.bio}
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                    disabled={!isEditing}
+                    disabled={!isEditing || isSaving}
                   />
                 </div>
 
                 <div className="flex gap-2">
-                  {!isEditing ? (
-                    <Button type="button" onClick={() => setIsEditing(true)}>
-                      Edit Profile
-                    </Button>
-                  ) : (
+                  {isEditing && (
                     <>
-                      <Button type="submit">
+                      <Button type="submit" disabled={isSaving}>
                         <Save className="h-4 w-4 mr-2" />
-                        Save Changes
+                        {isSaving ? <Spinner className="mr-2" /> : null}
+                        {isSaving ? "Saving..." : "Save Changes"}
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
+                        disabled={isSaving}
                         onClick={() => {
                           setIsEditing(false)
                           setFormData({

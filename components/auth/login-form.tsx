@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/lib/hooks/use-auth"
 import { Eye, EyeOff } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
 import Link from "next/link"
 
 export function LoginForm() {
@@ -16,6 +17,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const router = useRouter()
 
@@ -23,15 +25,20 @@ export function LoginForm() {
     e.preventDefault()
     setError("")
 
-    const user = await login(username, password)
-    if (user) {
-      if (user.role === "admin") {
-        router.push("/admin/dashboard")
+    setLoading(true)
+    try {
+      const user = await login(username, password)
+      if (user) {
+        if (user.role === "admin") {
+          router.push("/admin/dashboard")
+        } else {
+          router.push("/employee/dashboard")
+        }
       } else {
-        router.push("/employee/dashboard")
+        setError("Invalid credentials")
       }
-    } else {
-      setError("Invalid credentials")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -87,11 +94,13 @@ export function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="h-12 pr-10"
+              disabled={loading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              disabled={loading}
             >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
@@ -100,8 +109,9 @@ export function LoginForm() {
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 
-        <Button type="submit" className="w-full h-12 bg-primary hover:bg-primary/90 text-white text-base">
-          Start now !
+        <Button type="submit" className="w-full h-12 bg-primary hover:bg-primary/90 text-white text-base" disabled={loading}>
+          {loading && <Spinner className="mr-2" />}
+          {loading ? "Signing in..." : "Start now !"}
         </Button>
 
         {/* <div className="relative">

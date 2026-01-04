@@ -86,10 +86,11 @@ export type ApiOptions = {
   body?: any
   token?: string
   headers?: Record<string, string>
+  suppressSuccessAlert?: boolean
 }
 
 export async function apiFetch(url: string, opts: ApiOptions = {}) {
-  const { method = "GET", body, token, headers = {} } = opts
+  const { method = "GET", body, token, headers = {}, suppressSuccessAlert = false } = opts
   const init: RequestInit = {
     method,
     headers: {
@@ -106,7 +107,7 @@ export async function apiFetch(url: string, opts: ApiOptions = {}) {
     Swal.fire("Error", String(msg), "error")
     throw new Error(msg)
   }
-  if (method !== "GET") {
+  if (method !== "GET" && !suppressSuccessAlert) {
     const message = (data && (data.message || data.status || "Success")) as string
     Swal.fire("Success", String(message), "success")
   }
