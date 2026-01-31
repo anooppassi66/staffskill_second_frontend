@@ -18,6 +18,7 @@ import Link from "next/link"
 import { Breadcrumb } from "@/components/ui/breadcrumb-wrapper"
 import { ENDPOINTS, apiFetch } from "@/lib/api"
 import { useAuth } from "@/lib/hooks/use-auth"
+import { uploadToS3 } from "@/lib/s3Upload"
 
 export default function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
@@ -39,6 +40,11 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
   })
 
   const [chapters, setChapters] = useState<Chapter[]>(course?.chapters || [])
+  const [courseImageFile, setCourseImageFile] = useState<File | null>(null)
+  const [lessonFiles, setLessonFiles] = useState<Record<string, File | null>>({})
+  const setLessonFile = (lessonId: string, file: File | null) => {
+    setLessonFiles((prev) => ({ ...prev, [lessonId]: file }))
+  }
 
   useEffect(() => {
     const loadCourse = async () => {
@@ -157,7 +163,21 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
 
     if (token) {
       try {
-        await apiFetch(ENDPOINTS.COURSES.UPDATE(resolvedParams.id), { method: "PUT", token, body: { ...formData, chapters } })
+        const payload: any = { ...formData, chapters }
+        if (courseImageFile) {
+          const r = await uploadToS3(courseImageFile, undefined, `courses/images/${Date.now()}-${courseImageFile.name}`)
+          if (r.success && r.key) payload.course_image_url = r.key
+        }
+        for (const ch of payload.chapters || []) {
+          for (const ls of ch.lessons || []) {
+            const f = lessonFiles[ls.id]
+            if (f) {
+              const r = await uploadToS3(f, undefined, `courses/${resolvedParams.id}/lessons/videos/${Date.now()}-${f.name}`)
+              if (r.success && r.key) ls.videoUrl = r.key
+            }
+          }
+        }
+        await apiFetch(ENDPOINTS.COURSES.UPDATE(resolvedParams.id), { method: "PUT", token, body: payload })
         router.push(`/admin/courses/${resolvedParams.id}`)
         return
       } catch {}
@@ -287,13 +307,8 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image">Course Image URL</Label>
-                <Input
-                  id="image"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <Label htmlFor="image">Course Image</Label>
+                <Input id="image" type="file" onChange={(e) => setCourseImageFile(e.target.files?.[0] || null)} />
               </div>
 
               <div className="space-y-2">
@@ -385,12 +400,8 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs">Video URL</Label>
-                              <Input
-                                value={lesson.videoUrl}
-                                onChange={(e) => updateLesson(chapter.id, lesson.id, "videoUrl", e.target.value)}
-                                placeholder="https://..."
-                              />
+                            <Label className="text-xs">Video File</Label>
+                            <Input type="file" onChange={(e) => setLessonFile(lesson.id, e.target.files?.[0] || null)} />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs">Duration (minutes)</Label>

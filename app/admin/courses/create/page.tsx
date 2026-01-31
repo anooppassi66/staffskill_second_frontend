@@ -16,9 +16,13 @@ import { mockCategories, mockCourses, type Course, type Chapter } from "@/lib/da
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import Link from "next/link"
 import { Breadcrumb } from "@/components/ui/breadcrumb-wrapper"
+import { useAuth } from "@/lib/hooks/use-auth"
+import { ENDPOINTS, apiFetch } from "@/lib/api"
+import { uploadToS3 } from "@/lib/s3Upload"
 
 export default function CreateCoursePage() {
   const router = useRouter()
+  const { token } = useAuth()
   const [courses, setCourses] = useLocalStorage<Course[]>("lms_courses", mockCourses)
   const [formData, setFormData] = useState({
     title: "",
@@ -32,6 +36,11 @@ export default function CreateCoursePage() {
   })
 
   const [chapters, setChapters] = useState<Chapter[]>([])
+  const [courseImageFile, setCourseImageFile] = useState<File | null>(null)
+  const [lessonFiles, setLessonFiles] = useState<Record<string, File | null>>({})
+  const setLessonFile = (lessonId: string, file: File | null) => {
+    setLessonFiles((prev) => ({ ...prev, [lessonId]: file }))
+  }
 
   const addChapter = () => {
     const newChapter: Chapter = {
@@ -103,8 +112,32 @@ export default function CreateCoursePage() {
     )
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (token) {
+      let courseImageKey = ""
+      if (courseImageFile) {
+        const r = await uploadToS3(courseImageFile, undefined, `courses/images/${Date.now()}-${courseImageFile.name}`)
+        if (r.success && r.key) courseImageKey = r.key
+      }
+      const payload: any = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        level: formData.level,
+        language: formData.language,
+        duration: formData.duration,
+        status: "draft",
+        isActive: false,
+      }
+      if (courseImageKey) payload.course_image_url = courseImageKey
+      try {
+        await apiFetch(ENDPOINTS.COURSES.CREATE, { method: "POST", token, body: payload })
+      } catch {}
+      router.push("/admin/courses")
+      return
+    }
 
     const newCourse: Course = {
       id: Date.now().toString(),
@@ -116,7 +149,19 @@ export default function CreateCoursePage() {
       completionRate: 0,
       createdAt: new Date().toISOString(),
     }
-
+    if (courseImageFile) {
+      const r = await uploadToS3(courseImageFile, undefined, `courses/images/${Date.now()}-${courseImageFile.name}`)
+      if (r.success && r.key) newCourse.image = r.key
+    }
+    for (const ch of newCourse.chapters) {
+      for (const ls of ch.lessons) {
+        const f = lessonFiles[ls.id]
+        if (f) {
+          const r = await uploadToS3(f, undefined, `courses/${newCourse.id}/lessons/videos/${Date.now()}-${f.name}`)
+          if (r.success && r.key) ls.videoUrl = r.key
+        }
+      }
+    }
     setCourses([...courses, newCourse])
     router.push("/admin/courses")
   }
@@ -237,13 +282,8 @@ export default function CreateCoursePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image">Course Image URL</Label>
-                <Input
-                  id="image"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <Label htmlFor="image">Course Image</Label>
+                <Input id="image" type="file" onChange={(e) => setCourseImageFile(e.target.files?.[0] || null)} />
               </div>
 
               <div className="space-y-2">
@@ -348,11 +388,10 @@ export default function CreateCoursePage() {
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs">Video URL</Label>
+                              <Label className="text-xs">Video File</Label>
                               <Input
-                                value={lesson.videoUrl}
-                                onChange={(e) => updateLesson(chapter.id, lesson.id, "videoUrl", e.target.value)}
-                                placeholder="https://..."
+                                type="file"
+                                onChange={(e) => setLessonFile(lesson.id, e.target.files?.[0] || null)}
                                 size="sm"
                               />
                             </div>
