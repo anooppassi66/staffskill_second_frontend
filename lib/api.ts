@@ -1,7 +1,7 @@
 "use client"
 
 import Swal from "sweetalert2"
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000/api"
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://lmsbackend.neurocruit.ai/api"
 const ROOT_URL = BASE_URL.replace(/\/api$/, "")
 
 export const APIS = {
