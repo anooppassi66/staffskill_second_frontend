@@ -1,7 +1,12 @@
 "use client"
 
 import Swal from "sweetalert2"
+// API root – can be overridden by NEXT_PUBLIC_API_BASE_URL in environment
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://lmsbackend.neurocruit.ai/api"
+// front‑end application base URL (used for asset/media links, canonical URLs, etc.)
+// defaults to the new deployment address
+const APP_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://neurocruit.ai/lms"
+// keep the original backend root derived from the API URL for convenience
 const ROOT_URL = BASE_URL.replace(/\/api$/, "")
 
 export const APIS = {
@@ -73,13 +78,18 @@ export const ENDPOINTS = {
 }
 
 export const MEDIA = {
-  ROOT: ROOT_URL,
+  // if you want assets to resolve relative to the front‑end host
+  ROOT: APP_BASE_URL,
   url: (p?: string) => {
     if (!p) return ""
     const path = p.startsWith("/") ? p : "/" + p
-    return ROOT_URL + path
+    return APP_BASE_URL + path
   },
 }
+
+// expose the computed values in case other modules need them
+export const API_ROOT = ROOT_URL
+export const APP_URL = APP_BASE_URL
 
 export type ApiOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE"
