@@ -28,7 +28,7 @@ export default function CreateCoursePage() {
     title: "",
     description: "",
     category: "",
-    level: "Beginner" as "Beginner" | "Intermediate" | "Advanced",
+    level: "Easy" as "Easy" | "Intermediate" | "Hard",
     language: "English",
     image: "",
     instructor: "Elijah Murray",
