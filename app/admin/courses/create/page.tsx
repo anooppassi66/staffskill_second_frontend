@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { Button } from "@/components/ui/button"
@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
-import { mockCategories, mockCourses, type Course, type Chapter } from "@/lib/data/mock-data"
+import { mockCourses, type Course, type Chapter } from "@/lib/data/mock-data"
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import Link from "next/link"
 import { Breadcrumb } from "@/components/ui/breadcrumb-wrapper"
@@ -24,6 +24,8 @@ export default function CreateCoursePage() {
   const router = useRouter()
   const { token } = useAuth()
   const [courses, setCourses] = useLocalStorage<Course[]>("lms_courses", mockCourses)
+  const [categories, setCategories] = useState<Array<{ _id: string; category_name: string }>>([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -41,6 +43,24 @@ export default function CreateCoursePage() {
   const setLessonFile = (lessonId: string, file: File | null) => {
     setLessonFiles((prev) => ({ ...prev, [lessonId]: file }))
   }
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      if (!token) return
+      try {
+        setCategoriesLoading(true)
+        const data = await apiFetch(ENDPOINTS.CATEGORIES.LIST, { token })
+        const list = Array.isArray(data.categories) ? data.categories : Array.isArray(data) ? data : []
+        setCategories(list)
+      } catch (error) {
+        console.error("Failed to load categories:", error)
+        setCategories([])
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+    loadCategories()
+  }, [token])
 
   const addChapter = () => {
     const newChapter: Chapter = {
@@ -226,13 +246,14 @@ export default function CreateCoursePage() {
                   <Select
                     value={formData.category}
                     onValueChange={(value) => setFormData({ ...formData, category: value })}
+                    disabled={categoriesLoading}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder={categoriesLoading ? "Loading categories..." : "Select category"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockCategories.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.category_name}>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat._id} value={cat.category_name}>
                           {cat.category_name}
                         </SelectItem>
                       ))}
