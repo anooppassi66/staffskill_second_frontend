@@ -253,7 +253,7 @@ export default function CreateCoursePage() {
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => (
-                        <SelectItem key={cat._id} value={cat.category_name}>
+                        <SelectItem key={cat._id} value={cat._id}>
                           {cat.category_name}
                         </SelectItem>
                       ))}
