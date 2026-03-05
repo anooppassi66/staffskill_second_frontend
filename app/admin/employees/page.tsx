@@ -39,6 +39,7 @@ export default function EmployeesPage() {
     gender: "male",
     dob: "",
     bio: "",
+    password: "",
   })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(true)
@@ -64,8 +65,10 @@ export default function EmployeesPage() {
     try {
       if (editingEmployee) {
         const id = editingEmployee._id
-        await apiFetch(ENDPOINTS.ADMIN.UPDATE_EMPLOYEE(id), { method: "PUT", token, body: formData })
-        setEmployees(employees.map((emp) => (emp._id === id ? { ...emp, ...formData } : emp)))
+        const updateData = { ...formData }
+        delete (updateData as any).password
+        await apiFetch(ENDPOINTS.ADMIN.UPDATE_EMPLOYEE(id), { method: "PUT", token, body: updateData })
+        setEmployees(employees.map((emp) => (emp._id === id ? { ...emp, ...updateData } : emp)))
       } else {
         const data = await apiFetch(ENDPOINTS.AUTH.REGISTER, { method: "POST", token, body: { ...formData, role: "employee" } })
         const created = data.user ? { _id: data.user.id, ...formData, email: data.user.email, role: "employee", isActive: true } : null
@@ -121,6 +124,7 @@ export default function EmployeesPage() {
       gender: "male",
       dob: "",
       bio: "",
+      password: "",
     })
     setEditingEmployee(null)
     setIsDialogOpen(false)
@@ -215,6 +219,18 @@ export default function EmployeesPage() {
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                   />
                 </div>
+                {!editingEmployee && (
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="Enter password for new employee"
+                    />
+                  </div>
+                )}
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={resetForm}>
