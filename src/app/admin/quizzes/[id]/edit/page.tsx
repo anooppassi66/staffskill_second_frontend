@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { use, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useRouter, useParams } from "next/navigation"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,11 +16,12 @@ import { mockCourses, mockQuizzes, type Quiz, type Question } from "@/lib/data/m
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import Link from "next/link"
 
-export default function EditQuizPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params)
+export default function EditQuizPage() {
+  const params = useParams()
+  const quizId = Array.isArray(params.id) ? params.id[0] : (params.id as string) || ""
   const router = useRouter()
   const [quizzes, setQuizzes] = useLocalStorage<Quiz[]>("lms_quizzes", mockQuizzes)
-  const quiz = quizzes.find((q) => q.id === resolvedParams.id)
+  const quiz = quizzes.find((q) => q.id === quizId)
 
   const [formData, setFormData] = useState<any>({
     title: quiz?.title || "",
@@ -82,7 +83,7 @@ export default function EditQuizPage({ params }: { params: Promise<{ id: string 
 
     setQuizzes(
       quizzes.map((q) =>
-        q.id === resolvedParams.id
+        q.id === quizId
           ? {
               ...q,
               title: formData.title,
