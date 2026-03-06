@@ -160,7 +160,7 @@ export default function CertificatesPage() {
           <Card className="bg-white border-border/40 shadow-sm">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Award className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Certificates Yet</h3>
+              <h3 className="text-lg font-semibold mb-2">No certificates found</h3>
               <p className="text-sm text-muted-foreground text-center max-w-md">
                 Complete courses and pass quizzes to earn certificates. Your achievements will appear here.
               </p>

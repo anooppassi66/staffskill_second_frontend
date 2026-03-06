@@ -36,7 +36,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
       course && typeof course.category === "object"
         ? ((course.category as any)?._id as string)
         : (course?.category as string) || "",
-    level: (course?.level || "Beginner") as "Beginner" | "Intermediate" | "Advanced",
+    level: (course?.level || "Easy") as "Easy" | "Intermediate" | "Hard",
     language: course?.language || "English",
     image: course?.image || "",
     instructor: course?.instructor || "",
@@ -62,9 +62,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
         const data = await apiFetch(ENDPOINTS.COURSES.ADMIN_GET(resolvedParams.id), { token })
         const c = data.course || data
         if (c) {
-          const normalizedLevel = ["Beginner", "Intermediate", "Advanced"].includes(String(c.level))
-            ? (c.level as "Beginner" | "Intermediate" | "Advanced")
-            : "Beginner"
+          const normalizedLevel = ["Easy", "Intermediate", "Hard"].includes(String(c.level))
+            ? (c.level as "Easy" | "Intermediate" | "Hard")
+            : "Easy"
           setFormData({
             title: c.title || "",
             description: c.description || "",
@@ -313,9 +313,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Beginner">Beginner</SelectItem>
+                      <SelectItem value="Easy">Easy</SelectItem>
                       <SelectItem value="Intermediate">Intermediate</SelectItem>
-                      <SelectItem value="Advanced">Advanced</SelectItem>
+                      <SelectItem value="Hard">Hard</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

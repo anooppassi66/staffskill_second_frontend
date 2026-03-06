@@ -39,7 +39,7 @@ export function RecentEnrollments({ items = [] }: { items?: RecentItem[] }) {
               </div>
             </div>
           ))}
-          {recentEnrollments.length === 0 && <div className="text-sm text-muted-foreground">No recent enrollments</div>}
+          {recentEnrollments.length === 0 && <div className="text-sm text-muted-foreground">No enrollments found</div>}
         </div>
       </CardContent>
     </Card>

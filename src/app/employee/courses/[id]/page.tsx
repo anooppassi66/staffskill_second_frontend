@@ -157,7 +157,7 @@ export default function CourseDetailPage() {
                       <CardDescription className="mt-2 text-base">{course.description}</CardDescription>
                     </div>
                     <Badge variant="secondary" className="ml-4">
-                      {course.level || "Beginner"}
+                      {course.level || "Easy"}
                     </Badge>
                   </div>
                 </CardHeader>

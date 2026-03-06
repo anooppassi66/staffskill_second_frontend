@@ -26,7 +26,7 @@ export interface Course {
   title: string
   description: string
   category: string
-  level: "Beginner" | "Intermediate" | "Advanced"
+  level: "Easy" | "Intermediate" | "Hard"
   language: string
   image: string
   status: "draft" | "published"
@@ -109,7 +109,7 @@ export const mockCourses: Course[] = [
     title: "Introduction to TypeScript",
     description: "Learn the fundamentals of working with TypeScript and how to create basic applications.",
     category: "Web Development",
-    level: "Beginner",
+    level: "Easy",
     language: "English",
     image: "/typescript-programming-blue-background.jpg",
     status: "published",
@@ -208,7 +208,7 @@ export const mockCourses: Course[] = [
     title: "WordPress Development",
     description: "Learn to build and customize WordPress websites.",
     category: "Web Development",
-    level: "Beginner",
+    level: "Easy",
     language: "English",
     image: "/wordpress-logo-blue.png",
     status: "published",

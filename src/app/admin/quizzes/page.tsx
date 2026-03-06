@@ -99,9 +99,14 @@ export default function QuizzesPage() {
 
         {error && <div className="text-sm text-destructive">{error}</div>}
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {quizzes.map((quiz) => (
-            <Card key={quiz._id} className="bg-white border-border/40 shadow-sm">
+        {!loading && quizzes.length === 0 ? (
+          <div className="py-12 text-center text-sm text-muted-foreground">
+            <p>No quizzes found</p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {quizzes.map((quiz) => (
+              <Card key={quiz._id} className="bg-white border-border/40 shadow-sm">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -158,6 +163,7 @@ export default function QuizzesPage() {
             </Card>
           ))}
         </div>
+        )}
       </div>
     </DashboardLayout>
   )

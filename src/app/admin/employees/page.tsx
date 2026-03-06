@@ -261,6 +261,13 @@ export default function EmployeesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {!loading && employees.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-4 text-sm text-muted-foreground">
+                      No employees found
+                    </TableCell>
+                  </TableRow>
+                )}
                 {employees.map((employee) => (
                   <TableRow key={employee._id}>
                     <TableCell>

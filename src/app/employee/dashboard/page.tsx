@@ -36,12 +36,12 @@ export default function EmployeeDashboard() {
                 description: c.short_description || c.description || "",
                 chapters: c.chapters || [],
                 duration: c.videoDurationMinutes || 0,
-                level: c.level || "Beginner",
+                level: c.level || "Easy",
                 image: c.thumbnail_url || c.course_image || "/placeholder.svg",
               }
               return { course: mapped, enrollment: { progress: it.progress, isCompleted: it.isCompleted } }
             } catch {
-              return { course: { id: it.course.id, title: it.course.title, description: "", chapters: [], duration: 0, level: "Beginner", image: "/placeholder.svg" }, enrollment: { progress: it.progress, isCompleted: it.isCompleted } }
+              return { course: { id: it.course.id, title: it.course.title, description: "", chapters: [], duration: 0, level: "Easy", image: "/placeholder.svg" }, enrollment: { progress: it.progress, isCompleted: it.isCompleted } }
             }
           }),
         )

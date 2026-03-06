@@ -66,9 +66,14 @@ export default function CoursesPage() {
 
         {error && <div className="text-sm text-destructive">{error}</div>}
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <Card key={course._id} className="overflow-hidden bg-white border-border/40 shadow-sm">
+        {!loading && courses.length === 0 ? (
+          <div className="py-12 text-center text-sm text-muted-foreground">
+            <p>No courses found</p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {courses.map((course) => (
+              <Card key={course._id} className="overflow-hidden bg-white border-border/40 shadow-sm">
               <div className="relative h-48 w-full bg-gradient-to-br from-primary to-secondary">
                 <Image
                   src={course.course_image ? MEDIA.url(course.course_image) : "/placeholder.svg?height=200&width=400"}
@@ -118,6 +123,7 @@ export default function CoursesPage() {
             </Card>
           ))}
         </div>
+        )}
       </div>
     </DashboardLayout>
   )

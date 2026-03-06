@@ -65,7 +65,7 @@ export default function EmployeeCoursesPage() {
         image: c.thumbnail_url ? MEDIA.url(c.thumbnail_url) : (c.course_image ? MEDIA.url(c.course_image) : "/placeholder.svg?height=160&width=400"),
         chapters,
         duration: c.videoDurationMinutes || c.duration || 0,
-        level: c.level || "Beginner",
+        level: c.level || "Easy",
       }
       const enrollment = {
         progress: progressPct,
