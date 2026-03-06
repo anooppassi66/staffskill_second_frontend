@@ -31,8 +31,12 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
   const [formData, setFormData] = useState({
     title: course?.title || "",
     description: course?.description || "",
-    category: course?.category || "",
-    level: (course?.level || "Beginner") as "Beginner" | "Intermediate" | "Advanced",
+    // prefer storing category ID rather than name
+    category:
+      course && typeof course.category === "object"
+        ? (course.category._id as string)
+        : (course?.category as string) || "",
+    level: (course?.level || "Easy") as "Easy" | "Intermediate" | "Hard",
     language: course?.language || "English",
     image: course?.image || "",
     instructor: course?.instructor || "",
@@ -58,13 +62,15 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
         const data = await apiFetch(ENDPOINTS.COURSES.ADMIN_GET(resolvedParams.id), { token })
         const c = data.course || data
         if (c) {
-          const normalizedLevel = ["Beginner", "Intermediate", "Advanced"].includes(String(c.level))
-            ? (c.level as "Beginner" | "Intermediate" | "Advanced")
-            : "Beginner"
+          const normalizedLevel = ["Easy", "Intermediate", "Hard"].includes(String(c.level))
+            ? (c.level as "Easy" | "Intermediate" | "Hard")
+            : "Easy"
           setFormData({
             title: c.title || "",
             description: c.description || "",
-            category: (typeof c.category === "object" ? c.category?.name : c.category) || "",
+            // convert category to ID when returned as object
+            category:
+              typeof c.category === "object" ? c.category?._id || "" : (c.category as string) || "",
             level: normalizedLevel,
             language: c.language || "English",
             image: c.image || c.course_image || "",
@@ -96,6 +102,17 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
     }
     loadCategories()
   }, [token])
+
+  // if the formData contains a category name instead of an id (e.g. from legacy storage
+  // or initial course data), convert it once we know the available categories
+  useEffect(() => {
+    if (!categoriesLoading && categories.length && formData.category) {
+      const matchByName = categories.find((c) => c.category_name === formData.category)
+      if (matchByName && matchByName._id !== formData.category) {
+        setFormData((fd) => ({ ...fd, category: matchByName._id }))
+      }
+    }
+  }, [categoriesLoading, categories, formData.category])
 
   const addChapter = () => {
     const newChapter: Chapter = {
@@ -278,7 +295,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => (
-                        <SelectItem key={cat._id} value={cat.category_name}>
+                        <SelectItem key={cat._id} value={cat._id}>
                           {cat.category_name}
                         </SelectItem>
                       ))}

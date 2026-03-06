@@ -33,7 +33,7 @@ export default function CreateCoursePage() {
     level: "Easy" as "Easy" | "Intermediate" | "Hard",
     language: "English",
     image: "",
-    instructor: "Elijah Murray",
+    instructor: "",
     duration: 0,
   })
 
