@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { Button } from "@/components/ui/button"
@@ -12,48 +12,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
-import type { Question } from "@/lib/data/mock-data"
+import { mockCourses, mockQuizzes, type Quiz, type Question } from "@/lib/data/mock-data"
+import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import Link from "next/link"
-import { ENDPOINTS, apiFetch } from "@/lib/api"
-import { useAuth } from "@/lib/hooks/use-auth"
 
-export default function CreateQuizPage() {
+export default function EditQuizPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params)
   const router = useRouter()
-  const { token } = useAuth()
-  const [courses, setCourses] = useState<Array<any>>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [formData, setFormData] = useState({
-    title: "",
-    courseId: "",
-    durationMinutes: 30,
-    passMarks: 50,
-    isPublic: true,
-    isActive: true,
-  })
-  const [questions, setQuestions] = useState<Question[]>([
-    {
-      id: "1",
-      question: "",
-      options: ["", "", "", ""],
-      correctAnswer: 0,
-      marks: 2,
-    },
-  ])
+  const [quizzes, setQuizzes] = useLocalStorage<Quiz[]>("lms_quizzes", mockQuizzes)
+  const quiz = quizzes.find((q) => q.id === resolvedParams.id)
 
-  useEffect(() => {
-    const loadCourses = async () => {
-      if (!token) return
-      try {
-        const data = await apiFetch(ENDPOINTS.COURSES.ADMIN_LIST, { token })
-        const list = Array.isArray(data.courses) ? data.courses : Array.isArray(data) ? data : []
-        setCourses(list)
-      } catch {
-        setCourses([])
-      }
-    }
-    loadCourses()
-  }, [token])
+  const [formData, setFormData] = useState<any>({
+    title: quiz?.title || "",
+    courseId: quiz?.courseId || "",
+    durationMinutes: quiz?.durationMinutes || 30,
+    passMarks: quiz?.passMarks || 50,
+    isPublic: quiz?.isPublic || true,
+    isActive: quiz?.isActive || true,
+  })
+
+  const [questions, setQuestions] = useState<Question[]>(quiz?.questions || [])
+
+  if (!quiz) {
+    return (
+      <DashboardLayout requiredRole="admin">
+        <div className="p-8">
+          <p>Quiz not found</p>
+        </div>
+      </DashboardLayout>
+    )
+  }
 
   const addQuestion = () => {
     const newQuestion: Question = {
@@ -87,35 +75,30 @@ export default function CreateQuizPage() {
     )
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!token) return
-    setLoading(true)
-    setError("")
-    try {
-      const totalMarks = questions.reduce((sum, q) => sum + q.marks, 0)
-      const payload = {
-        title: formData.title,
-        course: formData.courseId || undefined,
-        questions: questions.map((q) => ({
-          text: q.question,
-          options: q.options,
-          correctIndex: q.correctAnswer,
-          marks: q.marks,
-        })),
-        totalMarks,
-        passMarks: formData.passMarks,
-        durationMinutes: formData.durationMinutes,
-        isPublic: formData.isPublic,
-        isActive: formData.isActive,
-      }
-      await apiFetch(ENDPOINTS.QUIZZES.CREATE, { method: "POST", token, body: payload })
-      router.push("/admin/quizzes")
-    } catch (e: any) {
-      setError(e.message || "Failed to create quiz")
-    } finally {
-      setLoading(false)
-    }
+
+    const totalMarks = questions.reduce((sum, q) => sum + q.marks, 0)
+
+    setQuizzes(
+      quizzes.map((q) =>
+        q.id === resolvedParams.id
+          ? {
+              ...q,
+              title: formData.title,
+              courseId: formData.courseId || undefined,
+              questions,
+              totalMarks,
+              passMarks: formData.passMarks,
+              durationMinutes: formData.durationMinutes,
+              isPublic: formData.isPublic,
+              isActive: formData.isActive,
+            }
+          : q,
+      ),
+    )
+
+    router.push("/admin/quizzes")
   }
 
   return (
@@ -129,8 +112,8 @@ export default function CreateQuizPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Create New Quiz</h1>
-            <p className="text-muted-foreground mt-1">Add a new quiz for a course</p>
+            <h1 className="text-3xl font-bold text-foreground">Edit Quiz</h1>
+            <p className="text-muted-foreground mt-1">Update quiz information</p>
           </div>
         </div>
 
@@ -138,7 +121,7 @@ export default function CreateQuizPage() {
           <Card>
             <CardHeader>
               <CardTitle>Quiz Details</CardTitle>
-              <CardDescription>Basic information about the quiz</CardDescription>
+              <CardDescription>Update quiz information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -162,9 +145,9 @@ export default function CreateQuizPage() {
                     <SelectValue placeholder="Select course" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">General Quiz</SelectItem>
-                    {courses.map((course: any) => (
-                      <SelectItem key={course._id} value={course._id}>
+                    <SelectItem value="general">General Quiz</SelectItem> {/* Updated value prop */}
+                    {mockCourses.map((course) => (
+                      <SelectItem key={course.id} value={course.id}>
                         {course.title}
                       </SelectItem>
                     ))}
@@ -205,18 +188,18 @@ export default function CreateQuizPage() {
                 </div>
                 <Switch
                   checked={formData.isPublic}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isPublic: checked })}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isPublic: Boolean(checked) })}
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Active</Label>
-                  <p className="text-sm text-muted-foreground">Enable this quiz immediately</p>
+                  <p className="text-sm text-muted-foreground">Enable this quiz</p>
                 </div>
                 <Switch
                   checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: Boolean(checked) })}
                 />
               </div>
             </CardContent>
@@ -227,7 +210,7 @@ export default function CreateQuizPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Questions</CardTitle>
-                  <CardDescription>Add questions with multiple choice answers</CardDescription>
+                  <CardDescription>Update questions and answers</CardDescription>
                 </div>
                 <Button type="button" variant="outline" onClick={addQuestion}>
                   <Plus className="h-4 w-4 mr-2" />
@@ -296,7 +279,7 @@ export default function CreateQuizPage() {
           <div className="flex gap-2">
             <Button type="submit">
               <Save className="h-4 w-4 mr-2" />
-              {loading ? "Creating..." : "Create Quiz"}
+              Save Changes
             </Button>
             <Link href="/admin/quizzes">
               <Button type="button" variant="outline">
@@ -305,7 +288,6 @@ export default function CreateQuizPage() {
             </Link>
           </div>
         </form>
-        {error && <div className="text-sm text-destructive">{error}</div>}
       </div>
     </DashboardLayout>
   )

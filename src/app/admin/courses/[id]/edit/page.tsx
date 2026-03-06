@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { Button } from "@/components/ui/button"
@@ -16,33 +16,74 @@ import { mockCourses, type Course, type Chapter } from "@/lib/data/mock-data"
 import { useLocalStorage } from "@/lib/hooks/use-local-storage"
 import Link from "next/link"
 import { Breadcrumb } from "@/components/ui/breadcrumb-wrapper"
-import { useAuth } from "@/lib/hooks/use-auth"
 import { ENDPOINTS, apiFetch } from "@/lib/api"
+import { useAuth } from "@/lib/hooks/use-auth"
 import { uploadToS3 } from "@/lib/s3Upload"
 
-export default function CreateCoursePage() {
+export default function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params)
   const router = useRouter()
   const { token } = useAuth()
   const [courses, setCourses] = useLocalStorage<Course[]>("lms_courses", mockCourses)
-  const [categories, setCategories] = useState<Array<{ _id: string; category_name: string }>>([])
-  const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const course = courses.find((c) => c.id === resolvedParams.id)
+  const [loaded, setLoaded] = useState(false)
+
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    level: "Easy" as "Easy" | "Intermediate" | "Hard",
-    language: "English",
-    image: "",
-    instructor: "",
-    duration: 0,
+    title: course?.title || "",
+    description: course?.description || "",
+    // prefer storing category ID rather than name
+    category:
+      course && typeof course.category === "object"
+        ? ((course.category as any)?._id as string)
+        : (course?.category as string) || "",
+    level: (course?.level || "Beginner") as "Beginner" | "Intermediate" | "Advanced",
+    language: course?.language || "English",
+    image: course?.image || "",
+    instructor: course?.instructor || "",
+    duration: course?.duration || 0,
   })
 
-  const [chapters, setChapters] = useState<Chapter[]>([])
+  const [chapters, setChapters] = useState<Chapter[]>(course?.chapters || [])
   const [courseImageFile, setCourseImageFile] = useState<File | null>(null)
   const [lessonFiles, setLessonFiles] = useState<Record<string, File | null>>({})
+  const [categories, setCategories] = useState<Array<{ _id: string; category_name: string }>>([])
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
   const setLessonFile = (lessonId: string, file: File | null) => {
     setLessonFiles((prev) => ({ ...prev, [lessonId]: file }))
   }
+
+  useEffect(() => {
+    const loadCourse = async () => {
+      if (!token) {
+        setLoaded(true)
+        return
+      }
+      try {
+        const data = await apiFetch(ENDPOINTS.COURSES.ADMIN_GET(resolvedParams.id), { token })
+        const c = data.course || data
+        if (c) {
+          const normalizedLevel = ["Beginner", "Intermediate", "Advanced"].includes(String(c.level))
+            ? (c.level as "Beginner" | "Intermediate" | "Advanced")
+            : "Beginner"
+          setFormData({
+            title: c.title || "",
+            description: c.description || "",
+            // convert category to ID when returned as object
+            category:
+              typeof c.category === "object" ? c.category?._id || "" : (c.category as string) || "",
+            level: normalizedLevel,
+            language: c.language || "English",
+            image: c.image || c.course_image || "",
+            instructor: c.instructor || "",
+            duration: c.duration || c.videoDurationMinutes || 0,
+          })
+          setChapters(Array.isArray(c.chapters) ? c.chapters : [])
+        }
+      } catch {}
+      setLoaded(true)
+    }
+    loadCourse()
+  }, [token, resolvedParams.id])
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -61,6 +102,17 @@ export default function CreateCoursePage() {
     }
     loadCategories()
   }, [token])
+
+  // if the formData contains a category name instead of an id (e.g. from legacy storage
+  // or initial course data), convert it once we know the available categories
+  useEffect(() => {
+    if (!categoriesLoading && categories.length && formData.category) {
+      const matchByName = categories.find((c) => c.category_name === formData.category)
+      if (matchByName && matchByName._id !== formData.category) {
+        setFormData((fd) => ({ ...fd, category: matchByName._id }))
+      }
+    }
+  }, [categoriesLoading, categories, formData.category])
 
   const addChapter = () => {
     const newChapter: Chapter = {
@@ -91,6 +143,7 @@ export default function CreateCoursePage() {
                   id: Date.now().toString(),
                   title: "",
                   videoUrl: "",
+                  thumbnail: "",
                   duration: 0,
                   isCompleted: false,
                 },
@@ -132,81 +185,70 @@ export default function CreateCoursePage() {
     )
   }
 
+  if (!loaded) {
+    return (
+      <DashboardLayout requiredRole="admin">
+        <div className="p-8">
+          <p>Loading...</p>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (token) {
-      let courseImageKey = ""
-      if (courseImageFile) {
-        const r = await uploadToS3(courseImageFile, undefined, `courses/images/${Date.now()}-${courseImageFile.name}`)
-        if (r.success && r.key) courseImageKey = r.key
-      }
-      const payload: any = {
-        title: formData.title,
-        description: formData.description,
-        category: formData.category,
-        level: formData.level,
-        language: formData.language,
-        duration: formData.duration,
-        status: "draft",
-        isActive: false,
-      }
-      if (courseImageKey) payload.course_image_url = courseImageKey
       try {
-        await apiFetch(ENDPOINTS.COURSES.CREATE, { method: "POST", token, body: payload })
-      } catch {}
-      router.push("/admin/courses")
-      return
-    }
-
-    const newCourse: Course = {
-      id: Date.now().toString(),
-      ...formData,
-      status: "draft",
-      isActive: false,
-      chapters,
-      enrolledCount: 0,
-      completionRate: 0,
-      createdAt: new Date().toISOString(),
-    }
-    if (courseImageFile) {
-      const r = await uploadToS3(courseImageFile, undefined, `courses/images/${Date.now()}-${courseImageFile.name}`)
-      if (r.success && r.key) newCourse.image = r.key
-    }
-    for (const ch of newCourse.chapters) {
-      for (const ls of ch.lessons) {
-        const f = lessonFiles[ls.id]
-        if (f) {
-          const r = await uploadToS3(f, undefined, `courses/${newCourse.id}/lessons/videos/${Date.now()}-${f.name}`)
-          if (r.success && r.key) ls.videoUrl = r.key
+        const payload: any = { ...formData, chapters }
+        if (courseImageFile) {
+          const r = await uploadToS3(courseImageFile, undefined, `courses/images/${Date.now()}-${courseImageFile.name}`)
+          if (r.success && r.key) payload.course_image_url = r.key
         }
-      }
+        for (const ch of payload.chapters || []) {
+          for (const ls of ch.lessons || []) {
+            const f = lessonFiles[ls.id]
+            if (f) {
+              const r = await uploadToS3(f, undefined, `courses/${resolvedParams.id}/lessons/videos/${Date.now()}-${f.name}`)
+              if (r.success && r.key) ls.videoUrl = r.key
+            }
+          }
+        }
+        await apiFetch(ENDPOINTS.COURSES.UPDATE(resolvedParams.id), { method: "PUT", token, body: payload })
+        router.push(`/admin/courses/${resolvedParams.id}`)
+        return
+      } catch {}
     }
-    setCourses([...courses, newCourse])
-    router.push("/admin/courses")
+    setCourses(
+      courses.map((c) =>
+        c.id === resolvedParams.id ? { ...c, ...formData, chapters } : c,
+      ),
+    )
+    router.push(`/admin/courses/${resolvedParams.id}`)
   }
 
   return (
     <DashboardLayout requiredRole="admin">
       <div className="p-8 space-y-6">
-        <Breadcrumb
-          items={[
-            { label: "Home", href: "/admin/dashboard" },
-            { label: "Courses", href: "/admin/courses" },
-            { label: "Create Course" },
-          ]}
-        />
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/admin/dashboard" },
+              { label: "Courses", href: "/admin/courses" },
+              { label: formData.title || "Course", href: `/admin/courses/${resolvedParams.id}` },
+              { label: "Edit" },
+            ]}
+          />
 
         <div className="flex items-center gap-4">
-          <Link href="/admin/courses">
+          <Link href={`/admin/courses/${resolvedParams.id}`}>
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Create New Course</h1>
-            <p className="text-muted-foreground mt-1">Add a new course to the platform</p>
+            <h1 className="text-3xl font-bold text-foreground">Edit Course</h1>
+            <p className="text-muted-foreground mt-1">Update course information</p>
           </div>
         </div>
 
@@ -214,7 +256,7 @@ export default function CreateCoursePage() {
           <Card>
             <CardHeader>
               <CardTitle>Course Details</CardTitle>
-              <CardDescription>Enter the basic information for the new course</CardDescription>
+              <CardDescription>Update the course information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -271,9 +313,9 @@ export default function CreateCoursePage() {
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Easy">Easy</SelectItem>
+                      <SelectItem value="Beginner">Beginner</SelectItem>
                       <SelectItem value="Intermediate">Intermediate</SelectItem>
-                      <SelectItem value="Hard">Hard</SelectItem>
+                      <SelectItem value="Advanced">Advanced</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -316,18 +358,6 @@ export default function CreateCoursePage() {
                   required
                 />
               </div>
-
-              <div className="flex gap-2 pt-4">
-                <Button type="submit">
-                  <Save className="h-4 w-4 mr-2" />
-                  Create Course
-                </Button>
-                <Link href="/admin/courses">
-                  <Button type="button" variant="outline">
-                    Cancel
-                  </Button>
-                </Link>
-              </div>
             </CardContent>
           </Card>
 
@@ -336,7 +366,7 @@ export default function CreateCoursePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Chapters & Lessons</CardTitle>
-                  <CardDescription>Add chapters and lessons to your course</CardDescription>
+                  <CardDescription>Manage chapters and lessons for your course</CardDescription>
                 </div>
                 <Button type="button" onClick={addChapter} size="sm">
                   <Plus className="h-4 w-4 mr-2" />
@@ -350,7 +380,7 @@ export default function CreateCoursePage() {
                   No chapters yet. Click "Add Chapter" to get started.
                 </p>
               ) : (
-                chapters.map((chapter, chapterIndex) => (
+                chapters.map((chapter: any, chapterIndex: number) => (
                   <div key={chapter.id} className="border rounded-lg p-4 space-y-4">
                     <div className="flex items-center gap-4">
                       <div className="flex-1">
@@ -382,7 +412,7 @@ export default function CreateCoursePage() {
                         </Button>
                       </div>
 
-                      {chapter.lessons.map((lesson, lessonIndex) => (
+                      {chapter.lessons.map((lesson: any, lessonIndex: number) => (
                         <div key={lesson.id} className="border rounded p-3 space-y-3 bg-muted/20">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium">Lesson {lessonIndex + 1}</span>
@@ -405,16 +435,11 @@ export default function CreateCoursePage() {
                                 onChange={(e) => updateLesson(chapter.id, lesson.id, "title", e.target.value)}
                                 placeholder="Lesson title"
                                 required
-                                size="sm"
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs">Video File</Label>
-                              <Input
-                                type="file"
-                                onChange={(e) => setLessonFile(lesson.id, e.target.files?.[0] || null)}
-                                size="sm"
-                              />
+                            <Label className="text-xs">Video File</Label>
+                            <Input type="file" onChange={(e) => setLessonFile(lesson.id, e.target.files?.[0] || null)} />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs">Duration (minutes)</Label>
@@ -425,7 +450,6 @@ export default function CreateCoursePage() {
                                   updateLesson(chapter.id, lesson.id, "duration", Number.parseInt(e.target.value) || 0)
                                 }
                                 placeholder="0"
-                                size="sm"
                               />
                             </div>
                           </div>
@@ -441,9 +465,9 @@ export default function CreateCoursePage() {
           <div className="flex gap-2">
             <Button type="submit">
               <Save className="h-4 w-4 mr-2" />
-              Create Course
+              Save Changes
             </Button>
-            <Link href="/admin/courses">
+            <Link href={`/admin/courses/${resolvedParams.id}`}>
               <Button type="button" variant="outline">
                 Cancel
               </Button>

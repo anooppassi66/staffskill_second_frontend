@@ -91,6 +91,7 @@ export default function EmployeesPage() {
       gender: employee.gender || "male",
       dob: employee.dob ? String(employee.dob).slice(0, 10) : "",
       bio: employee.bio || "",
+      password: "",
     })
     setIsDialogOpen(true)
   }

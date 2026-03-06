@@ -19,9 +19,9 @@ type Chapter = { title: string; _id: string; lessons: Array<any> }
 type Lesson = { _id: string; name: string; video_url?: string; thumbnail_url?: string; description?: string; duration?: number; completed?: boolean }
 
 export default function CourseDetailPage() {
-  const params = useParams()
+  const params = useParams() as any
   const { token } = useAuth()
-  const courseId = params.id as string
+  const courseId = params?.id as string
 
   const [course, setCourse] = useState<any>(null)
   const [progress, setProgress] = useState<any>(null)
@@ -31,13 +31,16 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     const load = async () => {
+      if (!courseId || typeof courseId !== 'string') return
       setLoading(true)
       setError("")
       try {
+        // @ts-ignore
         const data = await apiFetch(ENDPOINTS.COURSES.PUBLIC_GET(courseId), { token })
         const c = data.course || data
         setCourse(c)
         if (token) {
+          // @ts-ignore
           const p = await apiFetch(ENDPOINTS.ENROLLMENTS.PROGRESS(courseId), { token })
           setProgress(p.enrollment || p)
         }

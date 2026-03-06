@@ -132,13 +132,13 @@ export default function AdminCourseDetailPage({ params }: { params: Promise<{ id
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {chapters.map((chapter, chapterIndex) => (
+                {chapters.map((chapter: any, chapterIndex: number) => (
                   <div key={chapter.id} className="border rounded-lg p-4 space-y-3">
                     <h3 className="font-semibold">
                       Chapter {chapterIndex + 1}: {chapter.title}
                     </h3>
                     <div className="space-y-2">
-                      {chapter.lessons.map((lesson, lessonIndex) => (
+                      {chapter.lessons.map((lesson: any, lessonIndex: number) => (
                         <div key={lesson.id} className="flex items-center justify-between p-3 bg-muted/50 rounded">
                           <div className="flex items-center gap-3">
                             <Play className="h-5 w-5 text-muted-foreground" />
