@@ -2,8 +2,10 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { useAuth } from "@/lib/hooks/use-auth"
+import { ENDPOINTS, apiFetch } from "@/lib/api"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,33 +14,92 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react"
-import { mockCourses, mockQuizzes, type Quiz, type Question } from "@/lib/data/mock-data"
-import { useLocalStorage } from "@/lib/hooks/use-local-storage"
+import { mockCourses, type Quiz, type Question } from "@/lib/data/mock-data"
 import Link from "next/link"
 
 export default function EditQuizPage() {
   const params = useParams()
   const quizId = Array.isArray(params.id) ? params.id[0] : (params.id as string) || ""
   const router = useRouter()
-  const [quizzes, setQuizzes] = useLocalStorage<Quiz[]>("lms_quizzes", mockQuizzes)
-  const quiz = quizzes.find((q) => q.id === quizId)
+  const { token } = useAuth()
 
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string>("")
   const [formData, setFormData] = useState<any>({
-    title: quiz?.title || "",
-    courseId: quiz?.courseId || "",
-    durationMinutes: quiz?.durationMinutes || 30,
-    passMarks: quiz?.passMarks || 50,
-    isPublic: quiz?.isPublic || true,
-    isActive: quiz?.isActive || true,
+    title: "",
+    courseId: "",
+    durationMinutes: 30,
+    passMarks: 50,
+    isPublic: true,
+    isActive: true,
   })
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [courses, setCourses] = useState<Array<any>>([])
 
-  const [questions, setQuestions] = useState<Question[]>(quiz?.questions || [])
+  // fetch quiz details from backend
+  useEffect(() => {
+    if (!quizId || !token) return
+    const loadQuiz = async () => {
+      setLoading(true)
+      setError("")
+      try {
+        const data = await apiFetch(ENDPOINTS.QUIZZES.GET(quizId), { token })
+        // depending on backend shape, may be data.quiz or data directly
+        const q = data.quiz || data
+        setFormData({
+          title: q.title || "",
+          courseId: q.courseId || "general",
+          durationMinutes: q.durationMinutes || 30,
+          passMarks: q.passMarks || 50,
+          isPublic: q.isPublic !== undefined ? q.isPublic : true,
+          isActive: q.isActive !== undefined ? q.isActive : true,
+        })
+        // convert questions if needed (backend names may differ)
+        const qs: Question[] = (q.questions || []).map((qq: any) => ({
+          id: qq._id || qq.id || Date.now().toString(),
+          question: qq.text || qq.question || "",
+          options: qq.options || [],
+          correctAnswer: qq.correctIndex ?? qq.correctAnswer ?? 0,
+          marks: qq.marks || 0,
+        }))
+        setQuestions(qs)
+      } catch (e: any) {
+        setError(e.message || "Failed to load quiz")
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadQuiz()
+  }, [quizId, token])
 
-  if (!quiz) {
+  // load available courses for dropdown
+  useEffect(() => {
+    if (!token) return
+    const loadCourses = async () => {
+      try {
+        const data = await apiFetch(ENDPOINTS.COURSES.ADMIN_LIST, { token })
+        const list = Array.isArray(data.courses) ? data.courses : Array.isArray(data) ? data : []
+        setCourses(list)
+      } catch {
+        setCourses([])
+      }
+    }
+    loadCourses()
+  }, [token])
+
+  if (loading) {
+    return (
+      <DashboardLayout requiredRole="admin">
+        <div className="p-8">Loading...</div>
+      </DashboardLayout>
+    )
+  }
+
+  if (error) {
     return (
       <DashboardLayout requiredRole="admin">
         <div className="p-8">
-          <p>Quiz not found</p>
+          <p className="text-destructive">{error}</p>
         </div>
       </DashboardLayout>
     )
@@ -76,30 +137,40 @@ export default function EditQuizPage() {
     )
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!token) return
 
     const totalMarks = questions.reduce((sum, q) => sum + q.marks, 0)
-
-    setQuizzes(
-      quizzes.map((q) =>
-        q.id === quizId
-          ? {
-              ...q,
-              title: formData.title,
-              courseId: formData.courseId || undefined,
-              questions,
-              totalMarks,
-              passMarks: formData.passMarks,
-              durationMinutes: formData.durationMinutes,
-              isPublic: formData.isPublic,
-              isActive: formData.isActive,
-            }
-          : q,
-      ),
-    )
-
-    router.push("/admin/quizzes")
+    setLoading(true)
+    setError("")
+    try {
+      const payload = {
+        title: formData.title,
+        courseId: formData.courseId === "general" ? undefined : formData.courseId || undefined,
+        questions: questions.map((q) => ({
+          text: q.question,
+          options: q.options,
+          correctIndex: q.correctAnswer,
+          marks: q.marks,
+        })),
+        totalMarks,
+        passMarks: formData.passMarks,
+        durationMinutes: formData.durationMinutes,
+        isPublic: formData.isPublic,
+        isActive: formData.isActive,
+      }
+      await apiFetch(ENDPOINTS.QUIZZES.UPDATE(quizId), {
+        method: "PUT",
+        token,
+        body: payload,
+      })
+      router.push("/admin/quizzes")
+    } catch (e: any) {
+      setError(e.message || "Failed to update quiz")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -147,8 +218,8 @@ export default function EditQuizPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="general">General Quiz</SelectItem> {/* Updated value prop */}
-                    {mockCourses.map((course) => (
-                      <SelectItem key={course.id} value={course.id}>
+                    {courses.map((course) => (
+                      <SelectItem key={course._id || course.id} value={course._id || course.id}>
                         {course.title}
                       </SelectItem>
                     ))}
