@@ -1,5 +1,5 @@
-//const BASE_URL = "https://api.staffskills.us";
-const BASE_URL = "http://127.0.0.1:4000/api";
+const BASE_URL = "https://lmsbackend.neurocruit.ai/api";
+//const BASE_URL = "http://127.0.0.1:4000/api";
 const ROOT_URL = BASE_URL.replace(/\/api$/, "");
 
 export const APIS = {
