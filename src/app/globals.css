@@ -1,130 +1,814 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-@custom-variant dark (&:is(.dark *));
-
-:root {
-  --background: oklch(0.975 0.005 210);
-  --foreground: oklch(0.25 0.03 240);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.03 240);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.03 240);
-
-  /* Updated primary color to #22223b for buttons and key UI elements */
-  --primary: oklch(0.18 0.04 260); /* #22223b - Dark Navy/Purple */
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.6 0.06 220); /* #457B9D - Medium Blue */
-  --secondary-foreground: oklch(0.985 0 0);
-  --accent: oklch(0.84 0.04 200); /* #A8DADC - Light Blue */
-  --accent-foreground: oklch(0.25 0.03 240);
-  --muted: oklch(0.96 0.01 150); /* #F1FAEE - Off White */
-  --muted-foreground: oklch(0.55 0.02 240);
-  --destructive: oklch(0.55 0.22 15); /* #E63946 - Red */
-  --destructive-foreground: oklch(0.985 0 0);
-
-  --border: oklch(0.9 0.01 220);
-  --input: oklch(0.9 0.01 220);
-  --ring: oklch(0.6 0.06 220);
-  --chart-1: oklch(0.6 0.06 220);
-  --chart-2: oklch(0.84 0.04 200);
-  --chart-3: oklch(0.42 0.08 240);
-  --chart-4: oklch(0.55 0.22 15);
-  --chart-5: oklch(0.75 0.05 210);
-  --radius: 0.5rem;
-
-  /* Updated sidebar color to #22223b */
-  --sidebar: oklch(0.18 0.04 260); /* #22223b */
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.6 0.06 220);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.25 0.04 260);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.15 0.03 260);
-  --sidebar-ring: oklch(0.6 0.06 220);
+html,
+body {
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+html {
+    font-family: "Poppins", sans-serif !important;
 }
 
-@theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+
+* {
+    padding: 0;
+    margin: 0;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+
+.custom-button {
+    background: #000000;
+    border: 1px solid #000000;
+    border-radius: 20px !important;
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: inline-block;
+    font-family: nunito, roboto, proxima-nova, "proxima nova", sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 16px;
+    min-height: 40px;
+    outline: 0;
+    padding: 12px 14px;
+    text-align: center;
+    text-rendering: geometricprecision;
+    text-transform: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: middle;
+}
+
+.custom-button:hover,
+.custom-button:active {
+    background-color: initial;
+    background-position: 0 0;
+    color: #ffffff;
+    background-color: #000000;
+    border-radius: 20px;
+}
+
+.custom-button:active {
+    opacity: .5;
+}
+
+
+
+.summary-card {
+    position: relative;
+    overflow: hidden;
+    padding-left: 50px;
+}
+
+.summary-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.card-enrolled .summary-icon {
+    background-color: #7952b3;
+    color: #fff;
+}
+
+.card-enrolled {
+    border-left: 5px solid #7952b3 !important;
+}
+
+.card-active .summary-icon {
+    background-color: #e63946;
+    color: #fff;
+}
+
+.card-active {
+    border-left: 5px solid #e63946 !important;
+}
+
+.card-completed .summary-icon {
+    background-color: #4cd964;
+    color: #fff;
+}
+
+.card-completed {
+    border-left: 5px solid #4cd964 !important;
+}
+
+.course-card .course-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+}
+
+.course-card .card-img-top {
+    height: 200px;
+    object-fit: contain;
+}
+
+.discount-badge {
+    z-index: 10;
+    font-weight: 600 !important;
+    padding: 0.4em 0.75em;
+}
+
+.course-card .view-course-btn {
+    border-color: #dee2e6;
+    color: #495057;
+}
+
+.course-card .view-course-btn:hover {
+    background-color: #495057;
+    color: white;
+}
+
+
+.list-group-item {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.main-border {
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px !important;
+    border: none !important;
+
+}
+
+
+
+.profile-card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    padding: 2rem;
+    background-color: #fff;
+}
+
+.profile-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.profile-header {
+    background-image: radial-gradient(#f5f7fa 1px, transparent 1px);
+    background-size: 24px 24px;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.profile-avatar {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.details-card {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+}
+
+.details-title {
+    font-weight: 600;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.details-rows {
+    width: 100%;
+}
+
+.details-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.details-row:last-child {
+    border-bottom: none;
+}
+
+.details-label {
+    color: #6c757d;
+}
+
+.details-value {
+    color: #212529;
+}
+
+.profile-title {
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: #343a40;
+}
+
+
+.info-label {
+    font-weight: 600;
+    color: #6c757d;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    font-weight: 400;
+    color: #212529;
+    margin-bottom: 1rem;
+    display: block;
+    word-break: break-word;
+}
+
+.bio-section {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f8f9fa;
+}
+
+.bio-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #343a40;
+}
+
+
+
+.course-tabs .nav-link {
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.course-tabs .nav-link.active {
+    background-color: #f8f9fa;
+    color: #000;
+    font-weight: 600;
+}
+
+.course-tabs {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+/* Course Card Styling */
+.course-card {
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+    height: 100%;
+}
+
+.course-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.course-card-img-top {
+    height: 12rem;
+    object-fit: cover;
+}
+
+.course-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    background-color: #dc3545 !important;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+    z-index: 10;
+}
+
+
+.wishlist-icon {
+    color: #fff;
+    cursor: pointer;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, .3);
+    border-radius: 50%;
+    padding: .25rem;
+    position: absolute;
+    height: 30px;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 31px;
+}
+
+
+.nav.nav-pills.course-tabs {
+    border: none !important;
+    margin-bottom: 1.5rem;
+}
+
+
+.nav.nav-pills.course-tabs .nav-link:hover {
+    color: #6c757d;
+    background-color: transparent;
+}
+
+.nav.nav-pills.course-tabs .nav-link.active {
+    background-color: #e63946 !important;
+    border-radius: 30px !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.card-category {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.card-author {
+    font-size: 0.9rem;
+    color: #495057;
+    font-weight: 600;
+}
+
+.card-title-link {
+    font-weight: 500;
+    color: #212529;
+    text-decoration: none;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Footer elements (Rating, Price, Button) */
+.card-footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f8f9fa;
+}
+
+.course-price {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #000;
+}
+
+.rating-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.custom-pagination .page-link {
+    border: none;
+    border-radius: 0.25rem;
+    margin: 0 0.15rem;
+    color: #212529;
+}
+
+.custom-pagination .page-item.active .page-link {
+    background-color: #000;
+    border-color: #000;
+    color: white;
+}
+
+
+.card-footer-info {
+
+    .btn {
+        border-radius: 20px;
+    }
+}
+
+
+/* LinkedIn-style primary button */
+.btn-primary {
+    background-color: #0A66C2 !important;
+    border-color: #0A66C2 !important;
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 6px rgba(10, 102, 194, 0.24);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #004182 !important;
+    border-color: #004182 !important;
+    color: #fff !important;
+}
+
+.btn-primary:active {
+    background-color: #003362 !important;
+    border-color: #003362 !important;
+}
+
+.btn.rounded-pill {
+    border-radius: 9999px !important;
+}
+
+/* Info Card (Screenshot style) */
+.info-card {
+    border: 1px solid #dee2e6;
+    border-radius: 16px;
+    padding: 10px;
+    background-color: #fff;
+}
+
+.info-card-logo {
+    object-fit: cover;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    max-height: 170px;
+    display: block;
+}
+
+.info-card-org {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    font-weight: 400;
+    margin-top: 10px;
+}
+
+.info-card-title {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 8px;
+}
+
+.info-card-desc {
+    color: #4b5563;
+    font-size: 0.83rem;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.info-card-footer {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+
+.action-icons {
+    display: flex;
+    gap: 4px;
+}
+
+.action-icons .lucide {
+    cursor: pointer;
+    color: #6c757d;
+    transition: color 0.15s;
+}
+
+.action-icons .lucide:hover {
+    color: #343a40;
+}
+
+/* Coursera-style toast */
+.custom-toast {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border-radius: 12px !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+    padding: 12px 16px !important;
+}
+
+.custom-body {
+    width: 100%;
+}
+
+.custom-toast .Toastify__toast-body {
+    align-items: center !important;
+}
+
+.Toastify__close-button {
+    color: #6b7280 !important;
+}
+
+/* --- General Page & Typography --- */
+.course-page {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #333;
+    /* Darker default text */
+}
+
+.section-title {
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.course-description-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.read-more-link {
+    color: #5d54a4;
+    /* Custom link color */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* --- Course Header Image --- */
+.course-header-image {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* --- What You'll Learn List --- */
+.learn-list ul li {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.learn-list .text-success {
+    color: #5d54a4 !important;
+    /* Making the checkmarks blue/purple */
+}
+
+/* --- Course Content Accordion --- */
+.course-accordion-item {
+    border: 1px solid #dee2e6;
+    margin-bottom: 10px;
+    border-radius: 8px !important;
+    overflow: hidden;
+}
+
+.accordion-button {
+    background-color: #fff !important;
+    /* White background for the accordion header, as in new screenshot */
+    color: #333 !important;
+    font-size: 1rem;
+    padding: 15px 20px;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #f1f1f1 !important;
+    /* Slightly grey when open */
+    border-bottom: 1px solid #dee2e6;
+    box-shadow: none;
+}
+
+/* --- Right Sidebar (Sticky) --- */
+.sticky-sidebar {
+    position: sticky;
+    top: 20px;
+    /* Adjust as needed for vertical position */
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* Sidebar "Enroll Now" Button */
+.enroll-now-btn {
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Sidebar Course Features List */
+.includes-list li {
+    font-size: 0.95rem;
+    /* Slightly larger text */
+    color: #6c757d;
+    line-height: 2;
+    /* More spacing between items */
+}
+
+.includes-list .text-muted {
+    color: #6c757d !important;
+}
+
+/* Remove any remaining styles for instructor/comment sections if they exist in your file */
+/* .instructor-section, .comment-section { display: none; } */
+
+
+/* --- Lesson Page Layout --- */
+.lesson-page {
+    /* Set min-height to push footer down and ensure full vertical space */
+    min-height: 100vh;
+    display: flex;
+}
+
+.lesson-page .row {
+    width: 100%;
+}
+
+/* --- Curriculum Sidebar (Left) --- */
+.sidebar-column {
+    background-color: #f8f9fa;
+    /* Light grey background for the sidebar */
+    border-right: 1px solid #e0e0e0;
+    /* Optional: Ensure sidebar takes full height */
+    height: 100vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+}
+
+.back-link {
+    color: #5d54a4;
+    /* Custom purple color */
+    font-size: 0.9rem;
+}
+
+.sidebar-title {
+    font-size: 1.2rem;
+}
+
+/* Progress Bar Customization */
+.course-progress {
+    background-color: #e9ecef;
+    border-radius: 3px;
+}
+
+.course-progress .progress-bar {
+    border-radius: 3px;
+}
+
+/* Curriculum Section Styling */
+.section-header {
+    background-color: #fff;
+    border: 1px solid #e0eeef;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 0.95rem;
+    color: #333;
+    transition: background-color 0.2s;
+}
+
+.section-header:hover {
+    background-color: #f1f1f1;
+}
+
+/* Lesson List */
+.lessons-list {
+    padding-left: 0;
+    margin-top: -10px;
+    /* Pull list closer to the header */
+}
+
+.lesson-item {
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background-color 0.2s, border-left 0.2s;
+}
+
+.lesson-item:hover {
+    background-color: #eeeeee;
+}
+
+.lesson-item.active-lesson {
+    background-color: #e0e0ff;
+    /* Light purple for active lesson */
+    border-left: 2px solid #5d54a4;
+    /* Purple accent bar */
+    font-weight: 500;
+}
+
+.lesson-item .bullet-point {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ccc;
+    /* Grey for incomplete lessons */
+}
+
+.lesson-item .text-success {
+    color: #4CAF50 !important;
+    /* Green checkmark */
+}
+
+/* --- Video Player & Content (Right) --- */
+.content-column {
+    /* Set content to occupy remaining height and space */
+    padding-bottom: 50px !important;
+    /* Extra space at the bottom */
+}
+
+.video-player-wrapper {
+    /* Ensures the video player div maintains aspect ratio */
+    position: relative;
+    width: 100%;
+}
+
+.video-player-wrapper>div {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Lesson Details */
+.lesson-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.read-more-link {
+    color: #5d54a4;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Tabs Styling */
+.lesson-tabs .nav-link {
+    color: #333;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 10px 15px;
+}
+
+.lesson-tabs .nav-link.active {
+    color: #5d54a4;
+    /* Active tab color */
+    border-bottom-color: #5d54a4;
+    /* Active tab underline */
+    background-color: transparent;
+}
+
+/* List Item Checks (What You'll Learn/Requirements) */
+.learn-list .text-muted {
+    color: #6c757d !important;
+}
+
+
+
+.custom-body {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+
+
+.custom-btn {
+  background: #000;
+  border-radius: 999px;
+  box-shadow: #000 0 10px 20px -10px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+  opacity: 1;
+  outline: 0 solid transparent;
+  padding: 5px 18px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: fit-content;
+  word-break: break-word;
+  border: 0;
+}
+
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #000000 !important;
+    --bs-btn-border-color: #000000 !important;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #000000 !important;
+    --bs-btn-hover-border-color: #000000 !important;
+    --bs-btn-focus-shadow-rgb: 49, 132, 253;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #000000 !important;
+    --bs-btn-active-border-color: #000000 !important;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #000000 !important;
+    --bs-btn-disabled-border-color: #000000 !important;
+}
+
+.card.border-0.shadow-sm {
+    border: 0px solid #554e4e !important;
+    background: #e4e4e4 !important;
+    border-radius: 21px !important;
 }

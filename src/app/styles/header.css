@@ -1,0 +1,45 @@
+.header-blue {
+  height: 100px;
+  background: linear-gradient(135deg, #2e2c2c 0%, #4c4c4d 50%, #929292 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 20px 40px;
+  justify-content: space-between;
+  position: relative;
+}
+.card.border-0.shadow-sm {
+    border: 1px solid #000 !important;
+}
+
+.header-blue::after {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.profile-img-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.profile-img {
+  border: 3px solid #fff;
+}
+
+.status-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  background-color: #22c55e; /* green */
+  border: 2px solid #fff;
+  border-radius: 50%;
+}

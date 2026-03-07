@@ -1,0 +1,51 @@
+.login-page {
+  background-color: #f8f9fa;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 15px;
+  background: #fff;
+}
+
+.form-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2937;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.6rem;
+}
+
+.input-group-text {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: transparent;
+}
+
+.form-control {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: transparent;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #4f46e5;
+}
+
+.btn-danger {
+  background-color: #f14c57;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  background-color: #dc3545;
+}
+
+a.text-primary:hover {
+  text-decoration: underline;
+}

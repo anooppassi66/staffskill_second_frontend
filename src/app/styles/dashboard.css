@@ -1,0 +1,16 @@
+.stat-card {
+  border-radius: 10px;
+  transition: transform 0.2s ease-in-out;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
