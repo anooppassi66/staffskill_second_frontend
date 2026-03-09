@@ -18,7 +18,7 @@
 /* Left Panel Styling with Gradient */
 .left-panel {
     /* Beautiful Gradient Background */
-    background: linear-gradient(135deg, #caf0f8 0%, #000000 100%); 
+    background: #004f45;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -180,7 +180,7 @@
 }
 
 .custom-button {
-    background-color: #000000; /* Primary Blue button background */
+    background-color: #004f45; /* Primary Blue button background */
     color: #fff;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -192,7 +192,7 @@
 }
 
 .custom-button:hover {
-    background-color: #000000; /* Accent Blue hover */
+    background-color: #004f45; /* Accent Blue hover */
     color: #fff;
 }
 

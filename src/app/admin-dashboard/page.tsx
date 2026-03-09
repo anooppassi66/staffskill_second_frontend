@@ -90,7 +90,7 @@ export default function AdminDashboardPage() {
   }, [])
 
   const Card = ({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number | string; color: string }) => (
-    <div className="card border-0 shadow-sm">
+    <div className="card border-0 shadow-sm" style={{ background: 'rgba(1, 138, 120, .56)' }}>
       <div className="card-body d-flex align-items-center">
         <div className="rounded-3 d-flex align-items-center justify-content-center me-3" style={{ width: 40, height: 40, background: color }}>
           {icon}
@@ -126,12 +126,12 @@ export default function AdminDashboardPage() {
 
         {metrics && (
           <div className="row g-3 mb-4">
-            <div className="col-md-4 col-sm-6"><Card icon={<GraduationCap size={20} />} label="Enrolled Courses" value={metrics.enrolledCourses} color="#EEF2FF" /></div>
-            <div className="col-md-4 col-sm-6"><Card icon={<BookOpen size={20} />} label="Active Courses" value={metrics.activeCourses} color="#FFEFE9" /></div>
-            <div className="col-md-4 col-sm-6"><Card icon={<CheckCircle2 size={20} />} label="Avg Courses Completed" value={metrics.avgCoursesCompleted} color="#EAF7EE" /></div>
-            <div className="col-md-4 col-sm-6"><Card icon={<Users size={20} />} label="Total Employees" value={metrics.totalEmployees} color="#F2ECFF" /></div>
-            <div className="col-md-4 col-sm-6"><Card icon={<Library size={20} />} label="Total Courses" value={metrics.totalCourses} color="#EAF6FF" /></div>
-            <div className="col-md-4 col-sm-6"><Card icon={<Gauge size={20} />} label="Course Completion Percentage" value={`${metrics.employeeCompletionPercentage}%`} color="#FFF5EA" /></div>
+            <div className="col-md-4 col-sm-6"><Card icon={<GraduationCap size={20} />} label="Enrolled Courses" value={metrics.enrolledCourses} /></div>
+            <div className="col-md-4 col-sm-6"><Card icon={<BookOpen size={20} />} label="Active Courses" value={metrics.activeCourses} /></div>
+            <div className="col-md-4 col-sm-6"><Card icon={<CheckCircle2 size={20} />} label="Avg Courses Completed" value={metrics.avgCoursesCompleted} /></div>
+            <div className="col-md-4 col-sm-6"><Card icon={<Users size={20} />} label="Total Employees" value={metrics.totalEmployees} /></div>
+            <div className="col-md-4 col-sm-6"><Card icon={<Library size={20} />} label="Total Courses" value={metrics.totalCourses} /></div>
+            <div className="col-md-4 col-sm-6"><Card icon={<Gauge size={20} />} label="Course Completion Percentage" value={`${metrics.employeeCompletionPercentage}%`} /></div>
           </div>
         )}
 

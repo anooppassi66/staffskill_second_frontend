@@ -84,8 +84,8 @@ a {
 }
 
 .card-enrolled .summary-icon {
-    background-color: #7952b3;
-    color: #fff;
+    background-color: #88bcb5 !important;
+    color: #000;
 }
 
 .card-enrolled {
@@ -93,8 +93,8 @@ a {
 }
 
 .card-active .summary-icon {
-    background-color: #e63946;
-    color: #fff;
+    background-color: #88bcb5;
+    color: #000;
 }
 
 .card-active {
@@ -102,8 +102,8 @@ a {
 }
 
 .card-completed .summary-icon {
-    background-color: #4cd964;
-    color: #fff;
+    background-color: #88bcb5;
+    color: #000;
 }
 
 .card-completed {
@@ -336,10 +336,14 @@ a {
 }
 
 .nav.nav-pills.course-tabs .nav-link.active {
-    background-color: #e63946 !important;
+    background-color: #004f45 !important;
     border-radius: 30px !important;
     color: #fff !important;
     font-weight: 600;
+}
+
+.card.summary-card {
+    background: #88bcb5 !important;
 }
 
 .card-category {
@@ -391,8 +395,8 @@ a {
 }
 
 .custom-pagination .page-item.active .page-link {
-    background-color: #000;
-    border-color: #000;
+    background-color: #004f45;
+    border-color: #004f45;
     color: white;
 }
 
@@ -407,8 +411,8 @@ a {
 
 /* LinkedIn-style primary button */
 .btn-primary {
-    background-color: #0A66C2 !important;
-    border-color: #0A66C2 !important;
+    background-color: #004f45 !important;
+    border-color: #004f45 !important;
     color: #fff !important;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -417,8 +421,8 @@ a {
 
 .btn-primary:hover,
 .btn-primary:focus {
-    background-color: #004182 !important;
-    border-color: #004182 !important;
+    background-color: #004f45 !important;
+    border-color: #004f45 !important;
     color: #fff !important;
 }
 
@@ -769,7 +773,7 @@ a {
 
 
 .custom-btn {
-  background: #000;
+  background: rgb(0, 79, 69);;
   border-radius: 999px;
   box-shadow: #000 0 10px 20px -10px;
   box-sizing: border-box;
@@ -809,6 +813,6 @@ a {
 
 .card.border-0.shadow-sm {
     border: 0px solid #554e4e !important;
-    background: #e4e4e4 !important;
+    /* background: #e4e4e4 !important; */
     border-radius: 21px !important;
 }
