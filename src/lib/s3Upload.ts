@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
 // Configure S3 client
@@ -8,7 +8,6 @@ const s3Client = new S3Client({
     accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID || '',
     secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY || '',
   },
-  requestChecksumCalculation: "WHEN_SUPPORTED", // ✅ Add this
 });
 
 export interface UploadResult {
@@ -32,60 +31,27 @@ export const uploadToS3 = async (
   contentType?: string
 ): Promise<UploadResult> => {
   try {
-    // Generate a unique key if not provided
     const fileKey = key || `uploads/${Date.now()}-${file.name}`;
 
-    // const upload = new Upload({
-    //   client: s3Client,
-    //   params: {
-    //     Bucket: bucketName,
-    //     Key: fileKey,
-    //     Body: file,
-    //     ContentType: contentType || file.type,
-    //      ChecksumAlgorithm: "CRC32", // ✅ Add this line
-    //     //ACL: 'public-read', // Make the file publicly accessible
-    //   },
-    // });
-
-  //   const upload = new Upload({
-  //     client: s3Client,
-  //     queueSize: 1,        // upload parts sequentially to isolate the issue
-  // leavePartsOnError: false,  // ✅ auto-abort on failure, no stale upl
-  //     params: {
-  //       Bucket: bucketName,
-  //       Key: fileKey,
-  //       Body: file,
-  //       ContentType: contentType || file.type,
-  //       //  ChecksumAlgorithm: "CRC32", // ✅ Add this line
-  //       //ACL: 'public-read', // Make the file publicly accessible
-  //     },
-  //   });
-
-  const upload = new Upload({
-  client: s3Client,
-  queueSize: 4,
-  leavePartsOnError: false,
-  params: {
-    Bucket: bucketName,
-    Key: fileKey,
-    Body: file,
-    ContentType: contentType || file.type,
-  },
-});
+    const upload = new Upload({
+      client: s3Client,
+      queueSize: 1,              // sequential parts — avoids checksum race conditions
+      leavePartsOnError: false,  // auto-abort on failure, prevents stale uploads
+      params: {
+        Bucket: bucketName,
+        Key: fileKey,
+        Body: file,
+        ContentType: contentType || file.type,
+        ChecksumAlgorithm: "CRC32", // ✅ consistent with client-level config
+      },
+    });
 
     const result = await upload.done();
 
-    if (result) {
-      return {
-        success: true,
-        key: fileKey,
-      };
-    } else {
-      return {
-        success: false,
-        error: 'Upload completed but no location returned',
-      };
-    }
+    return result
+      ? { success: true, key: fileKey }
+      : { success: false, error: 'Upload completed but no result returned' };
+
   } catch (error: any) {
     console.error('S3 upload error:', error);
     return {
