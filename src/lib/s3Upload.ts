@@ -8,6 +8,7 @@ const s3Client = new S3Client({
     accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID || '',
     secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY || '',
   },
+  requestChecksumCalculation: "WHEN_SUPPORTED", // ✅ Add this
 });
 
 export interface UploadResult {
@@ -34,8 +35,22 @@ export const uploadToS3 = async (
     // Generate a unique key if not provided
     const fileKey = key || `uploads/${Date.now()}-${file.name}`;
 
+    // const upload = new Upload({
+    //   client: s3Client,
+    //   params: {
+    //     Bucket: bucketName,
+    //     Key: fileKey,
+    //     Body: file,
+    //     ContentType: contentType || file.type,
+    //      ChecksumAlgorithm: "CRC32", // ✅ Add this line
+    //     //ACL: 'public-read', // Make the file publicly accessible
+    //   },
+    // });
+
     const upload = new Upload({
       client: s3Client,
+      queueSize: 1,        // upload parts sequentially to isolate the issue
+  leavePartsOnError: false,  // ✅ auto-abort on failure, no stale upl
       params: {
         Bucket: bucketName,
         Key: fileKey,
