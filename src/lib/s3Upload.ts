@@ -47,19 +47,31 @@ export const uploadToS3 = async (
     //   },
     // });
 
-    const upload = new Upload({
-      client: s3Client,
-      queueSize: 1,        // upload parts sequentially to isolate the issue
-  leavePartsOnError: false,  // ✅ auto-abort on failure, no stale upl
-      params: {
-        Bucket: bucketName,
-        Key: fileKey,
-        Body: file,
-        ContentType: contentType || file.type,
-        //  ChecksumAlgorithm: "CRC32", // ✅ Add this line
-        //ACL: 'public-read', // Make the file publicly accessible
-      },
-    });
+  //   const upload = new Upload({
+  //     client: s3Client,
+  //     queueSize: 1,        // upload parts sequentially to isolate the issue
+  // leavePartsOnError: false,  // ✅ auto-abort on failure, no stale upl
+  //     params: {
+  //       Bucket: bucketName,
+  //       Key: fileKey,
+  //       Body: file,
+  //       ContentType: contentType || file.type,
+  //       //  ChecksumAlgorithm: "CRC32", // ✅ Add this line
+  //       //ACL: 'public-read', // Make the file publicly accessible
+  //     },
+  //   });
+
+  const upload = new Upload({
+  client: s3Client,
+  queueSize: 4,
+  leavePartsOnError: false,
+  params: {
+    Bucket: bucketName,
+    Key: fileKey,
+    Body: file,
+    ContentType: contentType || file.type,
+  },
+});
 
     const result = await upload.done();
 
