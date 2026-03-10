@@ -56,7 +56,7 @@ export const uploadToS3 = async (
         Key: fileKey,
         Body: file,
         ContentType: contentType || file.type,
-         ChecksumAlgorithm: "CRC32", // ✅ Add this line
+        //  ChecksumAlgorithm: "CRC32", // ✅ Add this line
         //ACL: 'public-read', // Make the file publicly accessible
       },
     });
