@@ -1,4 +1,4 @@
-import { S3Client } from '@aws-sdk/client-s3';
+import { ChecksumAlgorithm, S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
 // Configure S3 client
@@ -42,7 +42,7 @@ export const uploadToS3 = async (
         Key: fileKey,
         Body: file,
         ContentType: contentType || file.type,
-        ChecksumAlgorithm: "CRC32", // ✅ consistent with client-level config
+        ChecksumAlgorithm: ChecksumAlgorithm.CRC32,
       },
     });
 
