@@ -1,4 +1,5 @@
 import { S3Client } from '@aws-sdk/client-s3';
+import { RequestChecksumCalculation } from '@aws-sdk/middleware-flexible-checksums';
 import { Upload } from '@aws-sdk/lib-storage';
 
 // Configure S3 client
@@ -8,12 +9,13 @@ const s3Client = new S3Client({
     accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID || '',
     secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY || '',
   },
-  // We avoid sending a checksum algorithm on the multipart upload.  The
-  // helper normally adds one when the client’s requestChecksumCalculation
-  // configuration is set to either "WHEN_SUPPORTED" or "WHEN_REQUIRED".
-  // Since our params don’t include a ChecksumAlgorithm (see below) nothing
-  // will be calculated, and we can omit the field entirely to keep the
-  // TypeScript types happy.
+  // Configure when the S3 client *might* automatically calculate checksums
+  // for requests.  The upload helper only adds a checksum (defaulting to
+  // CRC32) when this is set to "WHEN_SUPPORTED" — which is the SDK's
+  // default.  By using "WHEN_REQUIRED" we effectively disable automatic
+  // addition of CRC32 on multipart creation unless we explicitly provide an
+  // algorithm ourselves.
+  requestChecksumCalculation: "WHEN_REQUIRED",
 });
 
 export interface UploadResult {
