@@ -8,16 +8,12 @@ const s3Client = new S3Client({
     accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID || '',
     secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY || '',
   },
-  // the Upload helper will automatically add a CRC32 checksum when the
-  // client is configured to calculate checksums on requests.  That checksum
-  // is only applied to the initial `CreateMultipartUpload` request, and due
-  // to a bug in the library it isn’t propagated to each part.  S3 then
-  // rejects the upload because the parts lack the required checksum header.
-  //
-  // The simplest workaround is to turn off request checksum calculation so
-  // no algorithm is set at all.  If you really need checksums you can add
-  // them manually per part or upgrade the SDK when a fix is released.
-  requestChecksumCalculation: 'disabled',
+  // We avoid sending a checksum algorithm on the multipart upload.  The
+  // helper normally adds one when the client’s requestChecksumCalculation
+  // configuration is set to either "WHEN_SUPPORTED" or "WHEN_REQUIRED".
+  // Since our params don’t include a ChecksumAlgorithm (see below) nothing
+  // will be calculated, and we can omit the field entirely to keep the
+  // TypeScript types happy.
 });
 
 export interface UploadResult {
