@@ -227,6 +227,7 @@ export default function LoginPage() {
                                 Don't have an account? <Link href="/signup" className="signup-link">Sign Up</Link>
                             </p> */}
                         </form>
+                        <p>Made with ❤ By <a href="http://www.kkeydos.com" target="_blank">KKEYDOS</a> </p>
                     </div>
                 </div>
             </div>
