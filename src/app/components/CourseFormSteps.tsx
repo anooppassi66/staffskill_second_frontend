@@ -62,7 +62,6 @@ const CourseFormSteps: React.FC = () => {
         }
         courseImageKey = uploadResult.key || ''
       }
-
       const payload: any = {
         title,
         category,
@@ -72,7 +71,7 @@ const CourseFormSteps: React.FC = () => {
       if (language) payload.language = language
       if (shortDesc) payload.short_description = shortDesc
       if (description) payload.description = description
-      if (courseImageKey) payload.course_image_url = courseImageKey
+      if (courseImageKey) payload.course_image = courseImageKey
 
       const res = await fetch(ENDPOINTS.COURSES.CREATE, {
         method: 'POST',
