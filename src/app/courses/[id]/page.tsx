@@ -384,6 +384,27 @@ export default function ManageCoursePage() {
                             <td className="fw-normal" data-label="Lesson">{ls.name}</td>
                             <td className="text-muted small" data-label="Description"><HtmlContent html={ls.description || '-'} className="text-muted small" truncate={150} /></td>
                             <td className="text-center" data-label="Media">
+                              {/* preview thumbnails/videos so admins can see content at a glance */}
+                              {ls.thumbnail_url && (
+                                <div className="mb-1">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={MEDIA.url(ls.thumbnail_url)}
+                                    alt="thumb"
+                                    style={{ width: 80, height: 45, objectFit: 'cover', borderRadius: 4 }}
+                                  />
+                                </div>
+                              )}
+                              {ls.video_url && (
+                                <div className="mb-1">
+                                  <video
+                                    src={MEDIA.url(ls.video_url)}
+                                    style={{ width: 100, maxHeight: 56 }}
+                                    muted
+                                    controls={false}
+                                  />
+                                </div>
+                              )}
                               <div className="action-icons justify-content-center gap-2">
                                 {ls.thumbnail_url ? <Image href={MEDIA.url(ls.thumbnail_url)} size={22} target="_blank">Thumbnail</Image> : null}
                                 {ls.video_url ? <Video href={MEDIA.url(ls.video_url)} size={22} target="_blank">Video</Video> : null}

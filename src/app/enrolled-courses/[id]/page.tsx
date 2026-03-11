@@ -219,12 +219,33 @@ const CoursePage: React.FC = () => {
                                             <div className="accordion-body text-muted small">
                                                 {ch.lessons && ch.lessons.length > 0 ? (
                                                   ch.lessons.map((ls: any, i: number) => (
-                                                    <div key={ls.id || i} className="d-flex align-items-center justify-content-between py-1">
-                                                      <div>Lesson {i + 1}: {ls.title} {ls.duration ? `(${ls.duration})` : ''}</div>
-                                                      <div className="d-flex gap-2">
-                                                        {ls.thumbnail_url ? <a className="btn btn-sm btn-outline-secondary" href={MEDIA.url(ls.thumbnail_url)} target="_blank" rel="noreferrer">Image</a> : null}
-                                                        {ls.video_url ? <a className="btn btn-sm btn-outline-secondary" href={MEDIA.url(ls.video_url)} target="_blank" rel="noreferrer">Video</a> : null}
+                                                    <div key={ls.id || i} className="d-flex flex-column gap-1 py-1">
+                                                      <div className="d-flex align-items-center justify-content-between">
+                                                        <div>Lesson {i + 1}: {ls.title} {ls.duration ? `(${ls.duration})` : ''}</div>
+                                                        <div className="d-flex gap-2">
+                                                          {ls.thumbnail_url ? <a className="btn btn-sm btn-outline-secondary" href={MEDIA.url(ls.thumbnail_url)} target="_blank" rel="noreferrer">Image</a> : null}
+                                                          {ls.video_url ? <a className="btn btn-sm btn-outline-secondary" href={MEDIA.url(ls.video_url)} target="_blank" rel="noreferrer">Video</a> : null}
+                                                        </div>
                                                       </div>
+                                                      {ls.thumbnail_url && (
+                                                        <div>
+                                                          <img
+                                                            src={MEDIA.url(ls.thumbnail_url)}
+                                                            alt="lesson thumbnail"
+                                                            style={{ width: 120, height: 68, objectFit: 'cover', borderRadius: 4 }}
+                                                          />
+                                                        </div>
+                                                      )}
+                                                      {ls.video_url && (
+                                                        <div>
+                                                          <video
+                                                            src={MEDIA.url(ls.video_url)}
+                                                            style={{ width: 160, maxHeight: 90 }}
+                                                            muted
+                                                            controls={false}
+                                                          />
+                                                        </div>
+                                                      )}
                                                     </div>
                                                   ))
                                                 ) : (
