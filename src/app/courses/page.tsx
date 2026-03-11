@@ -161,9 +161,9 @@ const Page = () => {
                                 <tr key={course._id || index}>
                                     <td>
                                         <div className="d-flex align-items-center gap-3">
-                                            {course.thumbnail_url ? (
+                                            {course.course_image ? (
                                                 // eslint-disable-next-line @next/next/no-img-element
-                                                <img src={MEDIA.url(course.thumbnail_url)} alt={course.title} style={{ width: 160, height: 80, objectFit: 'cover', borderRadius: 8 }} />
+                                                <img src={MEDIA.url(course.course_image)} alt={course.title} style={{ width: 160, height: 80, objectFit: 'cover', borderRadius: 8 }} />
                                             ) : (
                                                 <div style={{ width: 160, height: 80, borderRadius: 8, background: '#f1f3f5' }}></div>
                                             )}
