@@ -154,7 +154,7 @@ const Page = () => {
                             )}
                             {!loading && items.length === 0 && (
                                 <tr>
-                                    <td colSpan={4}>No courses found</td>
+                                    <td colSpan={6}>No courses found</td>
                                 </tr>
                             )}
                             {items.map((course: any, index: number) => (
