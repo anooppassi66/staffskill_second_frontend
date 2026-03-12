@@ -28,6 +28,8 @@ import { RootState } from "@/redux/store";
 import { clearUser } from "@/redux/slices/userSlice";
 import { NextResponse } from "next/server";
 
+import { useRouter } from 'next/navigation'
+
 const mainMenu = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard, active: true },
   { label: "My Profile", href: "/profile", icon: User },
@@ -73,6 +75,8 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     document.cookie = 'auth_token=; path=/; max-age=0'
     document.cookie = 'auth_role=; path=/; max-age=0'
     localStorage.removeItem("token");
+    const router = useRouter()
+    router.refresh()  // ← clears the router cache
     NextResponse.redirect('/login');
   }
   return (
