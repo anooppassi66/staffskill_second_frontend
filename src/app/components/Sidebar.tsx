@@ -20,7 +20,7 @@ import {
   FileBadge2,
   SquarePlus,
 } from "lucide-react";
-import { useRouter } from 'next/router';
+
 import "../styles/sidebar.css";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -68,12 +68,10 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
 
   console.log('router', router)
   const handleLogout = () => {
-    const router = useRouter();
     dispatch(clearUser())
     document.cookie = 'auth_token=; path=/; max-age=0'
     document.cookie = 'auth_role=; path=/; max-age=0'
-
-    router.push("/login");
+    localStorage.removeItem("token");
   }
   return (
     <div
