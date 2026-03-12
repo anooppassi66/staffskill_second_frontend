@@ -13,6 +13,7 @@ const ADMIN_ALLOWED = [
   '/quiz',
   '/settings',
   '/add-employee',
+  '/admin/enrollments',
 ]
 
 const USER_ALLOWED = [

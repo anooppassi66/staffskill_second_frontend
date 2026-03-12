@@ -21,6 +21,41 @@ export default function AdminLoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  const getCookie = (name: string) => {
+    if (typeof document === 'undefined') return null
+    const raw = document.cookie.split('; ').find((c) => c.startsWith(`${name}=`))?.split('=')[1] ?? null
+    if (!raw) return null
+    try {
+      return decodeURIComponent(raw)
+    } catch {
+      return raw
+    }
+  }
+
+  const clearCookie = (name: string) => {
+    if (typeof document === 'undefined') return
+    document.cookie = `${name}=; path=/; max-age=0`
+  }
+
+  const resolveRedirect = () => {
+    const queryValue = searchParams.get('redirect')
+    if (queryValue) return queryValue
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const redirectFromUrl = params.get('redirect')
+      if (redirectFromUrl) return redirectFromUrl
+    }
+
+    const cookieValue = getCookie('auth_redirect')
+    if (cookieValue) {
+      clearCookie('auth_redirect')
+      return cookieValue
+    }
+
+    return null
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -70,7 +105,7 @@ export default function AdminLoginPage() {
         })
       )
 
-      const redirectTo = searchParams.get('redirect')
+      const redirectTo = resolveRedirect()
       toast.update(tId, { render: 'Logged in', type: 'success', isLoading: false, autoClose: 1500 })
       router.push(redirectTo || '/admin-dashboard')
     } catch (err: any) {
