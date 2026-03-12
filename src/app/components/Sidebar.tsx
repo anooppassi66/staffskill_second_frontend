@@ -26,6 +26,7 @@ import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { clearUser } from "@/redux/slices/userSlice";
+import { NextResponse } from "next/server";
 
 const mainMenu = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard, active: true },
@@ -72,6 +73,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
     document.cookie = 'auth_token=; path=/; max-age=0'
     document.cookie = 'auth_role=; path=/; max-age=0'
     localStorage.removeItem("token");
+    NextResponse.redirect('/login');
   }
   return (
     <div
