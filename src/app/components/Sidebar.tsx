@@ -40,6 +40,7 @@ const AdminMenu = [
   { label: "Courses", href: "/courses", icon: BookOpen },
   // { label: "Assignments", href: "/assignments", icon: FileText },
   { label: "Employees", href: "/employees", icon: Users },
+  { label: "Enrollment Requests", href: "/admin/enrollments", icon: ClipboardList },
   { label: "Quiz Management", href: "/quiz", icon: MessageCircleQuestionMark },
   { label: "Employee Certificates", href: "/employee-certificates", icon: FileBadge2 },
   { label: "Add Employee", href: "/add-employee", icon: SquarePlus },
