@@ -68,6 +68,7 @@ export default function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsO
 
   console.log('router', router)
   const handleLogout = () => {
+    const router = useRouter();
     dispatch(clearUser())
     document.cookie = 'auth_token=; path=/; max-age=0'
     document.cookie = 'auth_role=; path=/; max-age=0'
