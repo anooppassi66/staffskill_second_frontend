@@ -106,19 +106,25 @@ const CoursePage: React.FC = () => {
       if (!id) return;
       let tId: any;
       try {
-        tId = toast.loading('Enrolling...');
+        tId = toast.loading('Requesting enrollment...');
         const res = await fetch(ENDPOINTS.ENROLLMENTS.ENROLL(id), {
           method: 'POST',
           headers: {
             ...(user.token ? { Authorization: `Bearer ${user.token}` } : {}),
           },
         });
+        const d = await res.json().catch(() => ({}));
         if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.message || 'Failed to enroll');
+          throw new Error(d.message || 'Failed to request enrollment');
         }
-        toast.update(tId, { render: 'Enrolled', type: 'success', isLoading: false, autoClose: 1500 });
-        router.push(`/enrolled-courses/${id}/lesson`);
+        const status = d?.enrollment?.status || 'pending';
+        if (status === 'approved') {
+          toast.update(tId, { render: 'Enrolled', type: 'success', isLoading: false, autoClose: 1500 });
+          router.push(`/enrolled-courses/${id}/lesson`);
+        } else {
+          toast.update(tId, { render: 'Request sent - waiting for approval', type: 'success', isLoading: false, autoClose: 3000 });
+        }
+        setData((prev: any) => ({ ...prev, enrollment: d.enrollment || { status } }));
       } catch (e: any) {
         if (tId) toast.update(tId, { render: e.message || 'Failed', type: 'error', isLoading: false, autoClose: 3000 });
       }
@@ -276,10 +282,23 @@ const CoursePage: React.FC = () => {
                                 </ul>
 
                                 <div className="d-grid gap-2 mt-4">
-                                    <button className="custom-btn enroll-now-btn" onClick={data?.enrollment ? resume : enroll}>
-                                        {data?.enrollment ? 'Resume' : 'Enroll Now'}
-                                    </button>
-                                    {data?.enrollment?.readyForQuiz && (
+                                    {data?.enrollment ? (
+                                      data.enrollment.status === 'pending' ? (
+                                        <button className="custom-btn" disabled>
+                                          Pending approval
+                                        </button>
+                                      ) : (
+                                        <button className="custom-btn enroll-now-btn" onClick={resume}>
+                                          Resume
+                                        </button>
+                                      )
+                                    ) : (
+                                      <button className="custom-btn enroll-now-btn" onClick={enroll}>
+                                        Request Access
+                                      </button>
+                                    )}
+
+                                    {data?.enrollment?.readyForQuiz && data?.enrollment?.status !== 'pending' && (
                                       <button
                                         className="custom-btn enroll-now-btn"
                                         onClick={async () => {

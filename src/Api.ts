@@ -49,6 +49,8 @@ export const ENDPOINTS = {
     },
     ENROLLMENTS: {
         ENROLL: (courseId: string) => `${APIS.ENROLLMENTS}/${courseId}/enroll`,
+        ENROLL_EMPLOYEE: (courseId: string, employeeId: string) => `${APIS.ENROLLMENTS}/${courseId}/enroll/${employeeId}`,
+        APPROVE: (enrollmentId: string) => `${APIS.ENROLLMENTS}/${enrollmentId}/approve`,
         ME: `${APIS.ENROLLMENTS}/me`,
         COMPLETE_LESSON: (courseId: string) => `${APIS.ENROLLMENTS}/${courseId}/complete-lesson`,
         PROGRESS: (courseId: string) => `${APIS.ENROLLMENTS}/${courseId}/progress`,

@@ -61,6 +61,10 @@ const EnrolledCourseCard: React.FC<CourseCardProps> = ({ course }) => {
             >
               Take Quiz
             </button>
+          ) : course.status === 'Pending' ? (
+            <button className="custom-btn" disabled>
+              Pending approval
+            </button>
           ) : (
             <button className="custom-btn" onClick={() => router.push(`/enrolled-courses/${course.id}`)}>
               View Course

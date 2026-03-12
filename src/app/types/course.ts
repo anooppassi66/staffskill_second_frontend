@@ -8,7 +8,7 @@ export interface Course {
   rating: number;
   reviews: number;
   price: number;
-  status: 'Enrolled' | 'Active' | 'Completed';
+  status: 'Pending' | 'Active' | 'Completed';
 }
 
 export interface Certificate {

@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [inProgress, setInProgress] = useState(false)
-    const [activeTab, setActiveTab] = useState<'Enrolled' | 'Active' | 'Completed'>('Enrolled')
+    const [activeTab, setActiveTab] = useState<'Pending' | 'Active' | 'Completed'>('Active')
     const [currentPage, setCurrentPage] = useState(1)
     const [enrolledCount, setEnrolledCount] = useState(0)
     const [activeCount, setActiveCount] = useState(0)
@@ -86,13 +86,13 @@ import { useRouter } from 'next/navigation';
     useEffect(() => {
         const mapped: Course[] = rawList.map((it: any) => {
             const c = it.course || it
-            const rawStatus = String(it?.status || c?.status || '').toLowerCase()
-            const status: 'Enrolled' | 'Active' | 'Completed' =
+            const rawStatus = String(it?.status || '').toLowerCase()
+            const status: 'Pending' | 'Active' | 'Completed' =
                 it?.isCompleted
                 ? 'Completed'
-                : (rawStatus.includes('active') || rawStatus.includes('progress') || rawStatus.includes('in_progress'))
-                  ? 'Active'
-                  : 'Enrolled'
+                : rawStatus === 'pending'
+                  ? 'Pending'
+                  : 'Active'
             const catName =
                 c?.category?.name || c?.category?.title || c?.category?.category_name ||
                 (typeof c?.category === 'string' ? (categoryMap[c.category] || '-') : '-')
@@ -112,7 +112,7 @@ import { useRouter } from 'next/navigation';
     }, [rawList, categoryMap])
 
     const tabs = useMemo(() => ([
-        { key: 'Enrolled', label: 'Enrolled', count: items.filter(c => c.status === 'Enrolled').length },
+        { key: 'Pending', label: 'Pending', count: items.filter(c => c.status === 'Pending').length },
         { key: 'Active', label: 'Active', count: items.filter(c => c.status === 'Active').length },
         { key: 'Completed', label: 'Completed', count: items.filter(c => c.status === 'Completed').length },
     ]), [items])
@@ -130,7 +130,7 @@ import { useRouter } from 'next/navigation';
         }
     }
 
-    const handleTabChange = (tab: 'Enrolled' | 'Active' | 'Completed') => {
+    const handleTabChange = (tab: 'Pending' | 'Active' | 'Completed') => {
         setActiveTab(tab)
         setCurrentPage(1)
     }
@@ -223,7 +223,7 @@ import { useRouter } from 'next/navigation';
             <ul className="nav nav-pills course-tabs">
                 {tabs.map(tab => (
                     <li className="nav-item" key={tab.key}>
-                        <a className={`nav-link ${activeTab === (tab.key as any) ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); handleTabChange(tab.key as 'Enrolled' | 'Active' | 'Completed'); }}>
+                        <a className={`nav-link ${activeTab === (tab.key as any) ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); handleTabChange(tab.key as 'Pending' | 'Active' | 'Completed'); }}>
                             {tab.label} ({String(tab.count).padStart(2, '')})
                         </a>
                     </li>
