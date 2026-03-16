@@ -28,6 +28,7 @@ export const ENDPOINTS = {
         UPDATE_EMPLOYEE: (employeeId: string) => `${APIS.ADMIN}/employees/${employeeId}`,
         DEACTIVATE_QUIZ: (quizId: string) => `${APIS.ADMIN}/quizzes/${quizId}/deactivate`,
         DASHBOARD: `${APIS.ADMIN}/dashboard`,
+        ENROLLED_EMPLOYEES: `${APIS.ADMIN}/enrolled-employees`,
     },
     CATEGORIES: {
         LIST: `${APIS.CATEGORIES}/`,

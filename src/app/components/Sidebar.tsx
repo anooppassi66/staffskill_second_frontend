@@ -44,6 +44,7 @@ const AdminMenu = [
   { label: "Courses", href: "/courses", icon: BookOpen },
   // { label: "Assignments", href: "/assignments", icon: FileText },
   { label: "Employees", href: "/employees", icon: Users },
+  { label: "Enrolled Employees", href: "/admin/enrolled-employees", icon: ClipboardList },
   { label: "Enrollment Requests", href: "/admin/enrollments", icon: ClipboardList },
   { label: "Quiz Management", href: "/quiz", icon: MessageCircleQuestionMark },
   { label: "Employee Certificates", href: "/employee-certificates", icon: FileBadge2 },
