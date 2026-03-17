@@ -159,7 +159,8 @@ export default function AdminDashboardPage() {
                       <div>
                         <div className="info-card-org">{c.org || '-'}</div>
                         <h6 className="info-card-title mb-1">{c.title}</h6>
-                        {c.desc && <p className="info-card-desc mb-2">{c.desc}</p>}
+                        {/* {c.desc && <p className="info-card-desc mb-2">{c.desc}</p>} */}
+                         {c.desc && <HtmlContent className="info-card-desc mb-2" html={desc} truncate={150} />}
                         {dueText && <div className="info-card-footer">Application due {dueText}</div>}
                         {pubText && <div className="info-card-footer mt-3">Publish at {pubText}</div>}
                       </div>
