@@ -14,6 +14,7 @@ const ADMIN_ALLOWED = [
   '/settings',
   '/add-employee',
   '/admin/enrollments',
+  '/admin/enrolled-employees',
 ]
 
 const USER_ALLOWED = [
