@@ -10,6 +10,7 @@ import { GraduationCap, BookOpen, CheckCircle2, Users, Library, Gauge } from 'lu
 import Image from 'next/image'
 import MainLoader from '@/app/components/MainLoader'
 import PageHeader from '../components/PageHeader'
+import HtmlContent from "../components/ui/HtmlContent";
 
 type Metrics = {
   enrolledCourses: number
@@ -160,7 +161,7 @@ export default function AdminDashboardPage() {
                         <div className="info-card-org">{c.org || '-'}</div>
                         <h6 className="info-card-title mb-1">{c.title}</h6>
                         {/* {c.desc && <p className="info-card-desc mb-2">{c.desc}</p>} */}
-                         {c.desc && <HtmlContent className="info-card-desc mb-2" html={desc} truncate={150} />}
+                         {c.desc && <HtmlContent className="info-card-desc mb-2" html={c.desc} truncate={150} />}
                         {dueText && <div className="info-card-footer">Application due {dueText}</div>}
                         {pubText && <div className="info-card-footer mt-3">Publish at {pubText}</div>}
                       </div>
