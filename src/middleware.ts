@@ -13,6 +13,8 @@ const ADMIN_ALLOWED = [
   '/add-employee',
   '/admin/enrollments',
   '/admin/enrolled-employees',
+  '/settings',
+  '/profile'
 ]
 
 const USER_ALLOWED = [
@@ -21,11 +23,14 @@ const USER_ALLOWED = [
   '/settings',
   '/enrolled-courses',
   '/certificates',
-  '/quiz',
+  '/quiz/',
 ]
 
 function isAllowed(pathname: string, allowed: string[]) {
   return allowed.some((p) => {
+      // ✅ Fix: exact match only for "/"
+    if (p === '/') return pathname === '/'
+
     if (p.endsWith('/')) return pathname.startsWith(p)
     return pathname === p || pathname.startsWith(p + '/')
   })
@@ -66,9 +71,9 @@ export async function middleware(request: NextRequest) {
   // 🟢 ADMIN LOGIC
   if (role === 'admin') {
     // ❌ Admin trying to access USER routes
-    if (isAllowed(pathname, USER_ALLOWED)) {
-      return NextResponse.redirect(new URL('/admin-dashboard', request.url))
-    }
+    // if (isAllowed(pathname, USER_ALLOWED)) {
+    //   return NextResponse.redirect(new URL('/admin-dashboard', request.url))
+    // }
 
     // ❌ Not in admin allowed
     if (!isAllowed(pathname, ADMIN_ALLOWED)) {
@@ -79,9 +84,9 @@ export async function middleware(request: NextRequest) {
   // 🔵 USER LOGIC
   else {
     // ❌ User trying to access ADMIN routes
-    if (isAllowed(pathname, ADMIN_ALLOWED)) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
+    // if (isAllowed(pathname, ADMIN_ALLOWED)) {
+    //   return NextResponse.redirect(new URL('/', request.url))
+    // }
 
     // ❌ Not in user allowed
     if (!isAllowed(pathname, USER_ALLOWED)) {
