@@ -7,11 +7,9 @@ const ADMIN_ALLOWED = [
   '/admin-dashboard',
   '/categories',
   '/courses',
-  '/profile',
   '/employees',
   '/employee-certificates',
   '/quiz',
-  '/settings',
   '/add-employee',
   '/admin/enrollments',
   '/admin/enrolled-employees',
@@ -23,7 +21,7 @@ const USER_ALLOWED = [
   '/settings',
   '/enrolled-courses',
   '/certificates',
-  '/quiz/',
+  '/quiz',
 ]
 
 function isAllowed(pathname: string, allowed: string[]) {
@@ -35,38 +33,59 @@ function isAllowed(pathname: string, allowed: string[]) {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  if (pathname.startsWith('/_next') || pathname.startsWith('/assets') || pathname === '/favicon.ico') {
+
+  // Skip static files
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/assets') ||
+    pathname === '/favicon.ico'
+  ) {
     return NextResponse.next()
   }
+
   const token = request.cookies.get('auth_token')?.value
   const role = request.cookies.get('auth_role')?.value
-  
+
+  // 🔐 Not logged in
   if (!token) {
     if (PUBLIC_PATHS.has(pathname)) {
       return NextResponse.next()
     }
+
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
-  if (pathname === '/login') {
+  // 🔁 Prevent accessing login pages after login
+  if (pathname === '/login' || pathname === '/admin') {
     const target = role === 'admin' ? '/admin-dashboard' : '/'
     return NextResponse.redirect(new URL(target, request.url))
   }
-  if (pathname === '/admin') {
-    const target = role === 'admin' ? '/admin-dashboard' : '/'
-    return NextResponse.redirect(new URL(target, request.url))
-  }
+
+  // 🟢 ADMIN LOGIC
   if (role === 'admin') {
-    if (!isAllowed(pathname, ADMIN_ALLOWED)) {
-      const homeUrl = new URL('/admin-dashboard', request.url)
-      return NextResponse.redirect(homeUrl)
+    // ❌ Admin trying to access USER routes
+    if (isAllowed(pathname, USER_ALLOWED)) {
+      return NextResponse.redirect(new URL('/admin-dashboard', request.url))
     }
-  } else {
+
+    // ❌ Not in admin allowed
+    if (!isAllowed(pathname, ADMIN_ALLOWED)) {
+      return NextResponse.redirect(new URL('/admin-dashboard', request.url))
+    }
+  }
+
+  // 🔵 USER LOGIC
+  else {
+    // ❌ User trying to access ADMIN routes
+    if (isAllowed(pathname, ADMIN_ALLOWED)) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    // ❌ Not in user allowed
     if (!isAllowed(pathname, USER_ALLOWED)) {
-      const homeUrl = new URL('/', request.url)
-      return NextResponse.redirect(homeUrl)
+      return NextResponse.redirect(new URL('/', request.url))
     }
   }
 
