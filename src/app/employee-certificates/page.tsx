@@ -9,7 +9,7 @@ import PageHeader from "../components/PageHeader";
 import { ENDPOINTS, MEDIA } from '@/Api';
 
 
-type CertItem = { _id?: string; name?: string; date?: string; marks?: number; outOf?: number; file?: string; user?: any };
+type CertItem = { _id?: string; name?: string; date?: string; marks?: number; outOf?: number; file?: string; filePath: string; user?: any };
 
 
 
