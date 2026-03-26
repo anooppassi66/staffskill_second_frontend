@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { Eye, Download } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
-import { ENDPOINTS } from '@/Api';
+import { RootState } from '@/redux/store';;
 import PageHeader from "../components/PageHeader";
+import { ENDPOINTS, MEDIA } from '@/Api';
 
 
 type CertItem = { _id?: string; name?: string; date?: string; marks?: number; outOf?: number; file?: string; user?: any };
@@ -103,8 +103,8 @@ const CertificatesTable: React.FC = () => {
                 <td className="text-center" data-label="Out of">{cert.outOf ?? ''}</td>
                 <td data-label="Actions">
                   <div className="action-icons justify-content-end">
-                    <a href={cert.file || '#'} target="_blank" rel="noreferrer"><Eye size={18} /></a>
-                    <a href={cert.file || '#'} target="_blank" rel="noreferrer" download><Download size={18} /></a>
+                    <a href={MEDIA.url(cert.file || cert.filePath || '') || '#'} target="_blank" rel="noreferrer"><Eye size={18} /></a>
+                    <a href={MEDIA.url(cert.file || cert.filePath || '') || '#'} target="_blank" rel="noreferrer" download><Download size={18} /></a>
                   </div>
                 </td>
               </tr>
