@@ -228,6 +228,28 @@ export default function LoginPage() {
                             </p> */}
                         </form>
                         {/* <p>Made with ❤ By <a href="http://www.kkeydos.com" target="_blank">KKEYDOS</a> </p> */}
+                        {/* Copyright Logos */}
+              <div className="mt-5 d-flex align-items-center justify-content-between opacity-75 pb-2">
+                <div className="d-flex align-items-center">
+                  <Image
+                    src="/assets/astra.webp"
+                    alt="Astra Consulting Corp"
+                    width={120}
+                    height={40}
+                    className="object-fit-contain"
+                  />
+                </div>
+                <div className="d-flex align-items-center gap-2 small text-secondary fw-medium pt-2">
+                  <span>Powered by</span>
+                  <a href="https://www.kkeydos.com/" target="_blank" rel="noopener noreferrer"><Image
+                    src="/assets/kkeydos.png"
+                    alt="Keydos"
+                    width={90}
+                    height={40}
+                    className="object-fit-contain"
+                  /></a>
+                </div>
+              </div>
                     </div>
                 </div>
             </div>
