@@ -244,7 +244,7 @@ const EmployeePage = () => {
                   <td colSpan={5}>No employees found</td>
                 </tr>
               )}
-              {employees.map((emp, idx) => (
+              {employees.filter(emp => emp.isActive !== false).map((emp, idx) => (
                 <tr key={emp._id || idx}>
                   <td className="fw-normal" data-label="#">{String(idx + 1).padStart(2, '0')}</td>
                   <td data-label="Name"><span className="fw-medium">{`${emp.first_name || ''} ${emp.last_name || ''}`.trim() || emp.user_name || emp.email}</span></td>

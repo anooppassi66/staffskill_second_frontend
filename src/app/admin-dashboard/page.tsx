@@ -72,12 +72,15 @@ export default function AdminDashboardPage() {
             thumb: MEDIA.url(c.course_image || ''),
             due: c.applicationDueDate || '',
             pub: c.createdAt || c.created_at || rc.createdAt || rc.created_at || '',
+            status: c.status || rc.status || '',
+            isActive: c.isActive !== undefined ? c.isActive : true
           }
         } catch {
-          return { id: rc.id, title: rc.title, org: '', desc: '', thumb: MEDIA.url(''), due: '', pub: rc.createdAt || rc.created_at || '' }
+          return { id: rc.id, title: rc.title, org: '', desc: '', thumb: MEDIA.url(''), due: '', pub: rc.createdAt || rc.created_at || '', status: rc.status || '', isActive: true }
         }
       }))
-      setRecentDetails(details)
+      const activeRecentDetails = details.filter(c => c.status !== 'deleted' && c.status !== 'archived')
+      setRecentDetails(activeRecentDetails)
     } catch (e: any) {
       setError(e.message || 'Unexpected error')
     } finally {
