@@ -340,8 +340,8 @@ const DashboardContent: React.FC = () => {
               <div className="col-12"><MainLoader /></div>
             ) : error ? (
               <div className="col-12"><p className="text-danger">{error}</p></div>
-            ) : enrolled.length > 0 ? (
-              enrolled?.slice(0, 3).map((c: any, idx: number) => (
+            ) : enrolled?.filter((c: any) => c?.status === 'active' || c?.isActive === true).length > 0 ? (
+              enrolled?.filter((c: any) => c?.status === 'active' || c?.isActive === true).slice(0, 3).map((c: any, idx: number) => (
                 <CourseCard
                   id={c._id || c.id || ''}
                   key={(c._id || c.id || idx) + '-enrolled'}
