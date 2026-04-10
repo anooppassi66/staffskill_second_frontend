@@ -289,7 +289,9 @@ const EmployeePage = () => {
                   <td data-label="Actions">
                     <div className="action-icons justify-content-center gap-3">
                       <Pencil size={18} onClick={() => openEdit(emp)} style={{cursor: 'pointer'}} />
-                      <Key size={18} onClick={() => regeneratePassword(emp)} style={{cursor: 'pointer'}} title="Regenerate Password" />
+                      <span title="Regenerate Password" style={{display: 'inline-flex', cursor: 'pointer', alignItems: 'center'}}>
+                        <Key size={18} onClick={() => regeneratePassword(emp)} />
+                      </span>
                       {emp.isActive ? (
                         <Trash2 size={18} onClick={() => deactivateEmployee(emp._id)} style={{cursor: 'pointer'}} />
                       ) : (
