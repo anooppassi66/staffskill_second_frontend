@@ -50,14 +50,14 @@ export default function RootLayout({
             {children}
           </main>
         </Providers>
-        <footer className="app-footer">
+        {/* <footer className="app-footer">
           <p>
             Made with ❤ By{' '}
             <a href="http://www.kkeydos.com" target="_blank" rel="noopener noreferrer">
               KKEYDOS
             </a>
           </p>
-        </footer>
+        </footer> */}
 
         <Script
           src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
