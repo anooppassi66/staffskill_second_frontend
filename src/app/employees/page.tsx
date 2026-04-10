@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { ENDPOINTS } from "@/Api";
 import { toast } from "react-toastify";
-import { Pencil, Trash2, CheckCircle } from "lucide-react";
+import { Pencil, Trash2, CheckCircle, Key } from "lucide-react";
 import MainLoader from '@/app/components/MainLoader';
 import ReactSelect from '../components/ui/ReactSelect';
 import PageHeader from "../components/PageHeader";
@@ -30,6 +30,7 @@ const EmployeePage = () => {
   const [editPhone, setEditPhone] = useState('');
   const [editGender, setEditGender] = useState('');
   const [editBio, setEditBio] = useState('');
+  const [newPasswordData, setNewPasswordData] = useState<{employeeName: string, password: string} | null>(null);
 
   const loadEmployees = async () => {
     setLoading(true);
@@ -172,6 +173,36 @@ const EmployeePage = () => {
     }
   };
 
+  const regeneratePassword = async (emp: any) => {
+    if (!window.confirm(`Are you sure you want to regenerate the password for ${emp.first_name || emp.user_name || 'this employee'}?`)) return;
+    let tId: any;
+    try {
+      tId = toast.loading("Regenerating password...");
+      const res = await fetch(ENDPOINTS.ADMIN.REGENERATE_PASSWORD(emp._id), {
+        method: "POST",
+        headers: {
+          ...(user.token ? { Authorization: `Bearer ${user.token}` } : {}),
+        },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to regenerate password");
+      }
+      const data = await res.json();
+      toast.update(tId, { render: "Password regenerated", type: "success", isLoading: false, autoClose: 1500 });
+      setNewPasswordData({
+        employeeName: `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || emp.user_name || emp.email,
+        password: data.tempPassword
+      });
+    } catch (err: any) {
+      if (tId) {
+        toast.update(tId, { render: err.message || "Failed", type: "error", isLoading: false, autoClose: 3000 });
+      } else {
+        toast.error(err.message || "Failed");
+      }
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="container-fluid py-4">
@@ -257,9 +288,10 @@ const EmployeePage = () => {
                   </td>
                   <td data-label="Actions">
                     <div className="action-icons justify-content-center gap-3">
-                      <Pencil size={18} onClick={() => openEdit(emp)} />
+                      <Pencil size={18} onClick={() => openEdit(emp)} style={{cursor: 'pointer'}} />
+                      <Key size={18} onClick={() => regeneratePassword(emp)} style={{cursor: 'pointer'}} title="Regenerate Password" />
                       {emp.isActive ? (
-                        <Trash2 size={18} onClick={() => deactivateEmployee(emp._id)} />
+                        <Trash2 size={18} onClick={() => deactivateEmployee(emp._id)} style={{cursor: 'pointer'}} />
                       ) : (
                         <CheckCircle size={18} onClick={() => activateEmployee(emp._id)} />
                       )}
@@ -345,6 +377,34 @@ const EmployeePage = () => {
                 <div className="modal-footer">
                   <button className="custom-btn" onClick={() => { setShowEdit(false); setEditTarget(null); }}>Cancel</button>
                   <button className="custom-btn" onClick={updateEmployee}>Update</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {newPasswordData && (
+        <>
+          <div className="modal-backdrop fade show" style={{ zIndex: 1050 }}></div>
+          <div className="modal fade show" style={{ display: 'block', zIndex: 1055 }}>
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content border-0 shadow">
+                <div className="modal-header">
+                  <h5 className="modal-title fw-semibold">Password Regenerated</h5>
+                  <button className="custom-btn" onClick={() => setNewPasswordData(null)}>X</button>
+                </div>
+                <div className="modal-body text-center">
+                  <p className="mb-2">New password for <strong>{newPasswordData.employeeName}</strong>:</p>
+                  <h3 className="fw-bold user-select-all mb-3 text-primary">{newPasswordData.password}</h3>
+                  <p className="text-muted small mb-0">Please copy this password and share it with the employee.</p>
+                </div>
+                <div className="modal-footer justify-content-center">
+                  <button className="custom-btn" onClick={() => {
+                    navigator.clipboard.writeText(newPasswordData.password);
+                    toast.success("Password copied to clipboard");
+                  }}>Copy Password</button>
+                  <button className="custom-btn" onClick={() => setNewPasswordData(null)}>Close</button>
                 </div>
               </div>
             </div>

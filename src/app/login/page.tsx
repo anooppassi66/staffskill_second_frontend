@@ -234,7 +234,7 @@ export default function LoginPage() {
                   <Image
                     src="/assets/astra.webp"
                     alt="Astra Consulting Corp"
-                    width={120}
+                    width={250}
                     height={40}
                     className="object-fit-contain"
                   />

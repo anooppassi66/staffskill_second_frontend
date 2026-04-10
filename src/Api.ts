@@ -26,6 +26,7 @@ export const ENDPOINTS = {
         DEACTIVATE_EMPLOYEE: (employeeId: string) => `${APIS.ADMIN}/employees/${employeeId}/deactivate`,
         ACTIVATE_EMPLOYEE: (employeeId: string) => `${APIS.ADMIN}/employees/${employeeId}/activate`,
         UPDATE_EMPLOYEE: (employeeId: string) => `${APIS.ADMIN}/employees/${employeeId}`,
+        REGENERATE_PASSWORD: (employeeId: string) => `${APIS.ADMIN}/employees/${employeeId}/regenerate-password`,
         DEACTIVATE_QUIZ: (quizId: string) => `${APIS.ADMIN}/quizzes/${quizId}/deactivate`,
         DASHBOARD: `${APIS.ADMIN}/dashboard`,
         ENROLLED_EMPLOYEES: `${APIS.ADMIN}/enrolled-employees`,
