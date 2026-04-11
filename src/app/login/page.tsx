@@ -142,7 +142,7 @@ export default function LoginPage() {
 
                          <div className="d-flex align-items-center">
                   <Image
-                    src="/assets/astra.png"
+                    src="/assets/Astra.png"
                     alt="Astra Consulting Corp"
                     width={500}
                     height={100}
