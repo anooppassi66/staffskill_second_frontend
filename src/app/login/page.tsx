@@ -140,7 +140,17 @@ export default function LoginPage() {
                             </Link>
                         </div> */}
 
-                        <h5 className="form-title">Sign into Your Account</h5>
+                         <div className="d-flex align-items-center">
+                  <Image
+                    src="/assets/astra.png"
+                    alt="Astra Consulting Corp"
+                    width={500}
+                    height={100}
+                    className="object-fit-contain"
+                  />
+                </div>
+
+                        {/* <h5 className="form-title">Sign into Your Account</h5> */}
                         {error && <div className="alert alert-danger" role="alert">{error}</div>}
 
                         <form onSubmit={handleSubmit}>
@@ -230,22 +240,13 @@ export default function LoginPage() {
                         {/* <p>Made with ❤ By <a href="http://www.kkeydos.com" target="_blank">KKEYDOS</a> </p> */}
                         {/* Copyright Logos */}
               <div className="mt-5 d-flex align-items-center justify-content-between opacity-75 pb-2">
-                <div className="d-flex align-items-center">
-                  <Image
-                    src="/assets/astra.webp"
-                    alt="Astra Consulting Corp"
-                    width={250}
-                    height={40}
-                    className="object-fit-contain"
-                  />
-                </div>
-                <div className="d-flex align-items-center gap-2 small text-secondary fw-medium pt-2">
-                  <span>Powered by</span>
+               
+                <div className="d-flex gap-2 small text-secondary fw-medium pt-2">
                   <a href="https://www.kkeydos.com/" target="_blank" rel="noopener noreferrer"><Image
                     src="/assets/kkeydos.png"
                     alt="Keydos"
-                    width={90}
-                    height={40}
+                    width={250}
+                    height={90}
                     className="object-fit-contain"
                   /></a>
                 </div>
