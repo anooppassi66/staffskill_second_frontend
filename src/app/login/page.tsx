@@ -129,16 +129,6 @@ export default function LoginPage() {
                 {/* Right Panel - Login Form */}
                 <div className="col-lg-6 col-12 d-flex justify-content-center align-items-center">
                     <div className="right-panel">
-                        {/* Top Navigation (Logo and Back to Home) */}
-                        {/* <div className="top-nav">
-                            <div className="logo-wrapper">
-                                <Image src="/assets/logo.svg" alt="DreamsLMS Logo" width={30} height={30} className="logo-img" />
-                                <span className="logo-text">Dreams<span style={{ color: '#e63946' }}>LMS</span></span>
-                            </div>
-                            <Link href="/" className="back-home-link">
-                                Back to Home
-                            </Link>
-                        </div> */}
 
                          <div className="d-flex align-items-center">
                   <Image
@@ -239,14 +229,13 @@ export default function LoginPage() {
                         </form>
                         {/* <p>Made with ❤ By <a href="http://www.kkeydos.com" target="_blank">KKEYDOS</a> </p> */}
                         {/* Copyright Logos */}
-              <div className="mt-5 d-flex align-items-center justify-content-between opacity-75 pb-2">
-               
-                <div className="d-flex gap-2 small text-secondary fw-medium pt-2">
-                  <a href="https://www.kkeydos.com/" target="_blank" rel="noopener noreferrer"><Image
+              <div className="opacity-75">
+  <div className="d-flex gap-2 small text-secondary fw-medium pt-2 justify-content-end">
+    <a href="https://www.kkeydos.com/" target="_blank" rel="noopener noreferrer"><Image
                     src="/assets/kkeydos.png"
                     alt="Keydos"
-                    width={250}
-                    height={90}
+                    width={200}
+                    height={70}
                     className="object-fit-contain"
                   /></a>
                 </div>

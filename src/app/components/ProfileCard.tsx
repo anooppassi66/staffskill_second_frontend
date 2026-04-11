@@ -34,24 +34,68 @@ const emptyProfile: UserProfile = {
 const ProfileCard: React.FC = () => {
   const user = useSelector((s: RootState) => s.user)
   const [profile, setProfile] = useState<UserProfile>(emptyProfile)
-  const [loading] = useState<boolean>(false)
-  const [error] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string>('')
 
   useEffect(() => {
-    const u: any = user || {}
-    const p: UserProfile = {
-      firstName: u.first_name || u.name || '',
-      lastName: u.last_name || '',
-      registrationDate: u.created_at ? new Date(u.created_at).toLocaleString() : '',
-      userName: u.user_name || u.username || '',
-      phoneNumber: u.phone_number || u.phone || '',
-      email: u.email || '',
-      gender: u.gender || '',
-      dob: u.dob || '',
-      age: typeof u.age === 'number' ? u.age : 0,
-      bio: u.bio || '',
+    const fetchProfile = async () => {
+      const uRedux: any = user || {}
+      if (!uRedux.token) {
+        // Fallback or early return if no token
+        const p: UserProfile = {
+          firstName: uRedux.first_name || uRedux.name || '',
+          lastName: uRedux.last_name || '',
+          registrationDate: uRedux.created_at ? new Date(uRedux.created_at).toLocaleString() : '',
+          userName: uRedux.user_name || uRedux.username || '',
+          phoneNumber: uRedux.phone_number || uRedux.phone || '',
+          email: uRedux.email || '',
+          gender: uRedux.gender || '',
+          dob: uRedux.dob || '',
+          age: typeof uRedux.age === 'number' ? uRedux.age : 0,
+          bio: uRedux.bio || '',
+        }
+        setProfile(p)
+        return;
+      }
+
+      setLoading(true)
+      setError('')
+      try {
+        const res = await fetch(ENDPOINTS.AUTH.PROFILE, {
+          headers: {
+            Authorization: `Bearer ${uRedux.token}`,
+          },
+        })
+        if (!res.ok) {
+          throw new Error('Failed to fetch profile')
+        }
+        const data = await res.json()
+        const u = data.user || data
+
+        const p: UserProfile = {
+          firstName: u.first_name || u.name || uRedux.first_name || '',
+          lastName: u.last_name || uRedux.last_name || '',
+          registrationDate: u.created_at || u.createdAt 
+            ? new Date(u.created_at || u.createdAt).toLocaleString() 
+            : uRedux.created_at 
+              ? new Date(uRedux.created_at).toLocaleString() : '',
+          userName: u.user_name || u.username || uRedux.user_name || '',
+          phoneNumber: u.phone_number || u.phone || uRedux.phone_number || '',
+          email: u.email || uRedux.email || '',
+          gender: u.gender || uRedux.gender || '',
+          dob: u.dob || uRedux.dob || '',
+          age: typeof u.age === 'number' ? u.age : typeof uRedux.age === 'number' ? uRedux.age : 0,
+          bio: u.bio || uRedux.bio || '',
+        }
+        setProfile(p)
+      } catch (err: any) {
+        setError(err.message || 'Error loading profile')
+      } finally {
+        setLoading(false)
+      }
     }
-    setProfile(p)
+
+    fetchProfile()
   }, [user])
 
   const InfoPair = ({ label, value }: { label: string; value: string | number }) => (
